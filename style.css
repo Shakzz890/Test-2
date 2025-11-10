@@ -1,0 +1,822 @@
+    :root {
+        --bg-primary: #000;
+        --bg-secondary: #111;
+        --bg-overlay: rgba(0, 0, 0, 0.85);
+        --bg-panel: rgba(18, 18, 18, 0.95);
+        --bg-panel-solid: #121212;
+        --bg-hover: rgba(255, 255, 255, 0.1);
+        --bg-selected: #505050;
+        --bg-focus: #0078d4;
+        --text-primary: #f1f1f1;
+        --text-secondary: #aaa;
+        --text-medium: #888;
+        --border-color: #444;
+        --primary-gradient: linear-gradient(90deg, #ff007b, #ff7b00);
+        --anim-time-fast: 0.3s;
+    }
+
+    /* ------------------------- BASE & PLAYER ------------------------- */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+    }
+
+    /* --- Prevent background scroll when a modal is open --- */
+    body.modal-open {
+        overflow: hidden;
+    }
+
+    #playerContainer {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: var(--bg-primary);
+        outline: none;
+        /* --- FIX: This puts the player BEHIND the idle screen --- */
+        z-index: 1; 
+    }
+
+    #avplayer {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* --- USER'S NEW CSS --- */
+    /* Remove all Shaka fade animations */
+    .shaka-controls-container,
+    .shaka-bottom-controls,
+    .shaka-play-button-container {
+      transition: none !important;
+      animation: none !important;
+      opacity: 1 !important;
+    }
+
+    /* Hide everything Shaka UI related */
+    .shaka-controls-container {
+      display: none !important;
+      pointer-events: none !important;
+    }
+    /* --- END USER'S NEW CSS --- */
+
+
+    /* ------------------------- UTILITY CLASSES ------------------------- */
+    .fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 5;
+    }
+
+    .HIDDEN {
+        display: none !important;
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    .custom-scrollbar {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+    }
+
+    /* ------------------------- OVERLAYS (LOADERS, INFO) ------------------------- */
+    #BlurOverlay {
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        /* --- FIX: z-index must be below modals (35) but above panels (30) --- */
+        z-index: 32; 
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    #BlurOverlay.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #ChannelLoader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--bg-primary);
+        /* --- FIX: Set z-index to 8 to be on top of player, below idle --- */
+        z-index: 8; 
+        opacity: 1;
+        transition: opacity 0.5s ease-out;
+    }
+
+    #ChannelLoader.fade-out {
+        opacity: 0;
+    }
+
+    .loader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        background: rgba(0,0,0,0.5);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #444;
+        border-top: 4px solid var(--text-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+        font-size: 1.1em;
+        font-weight: 500;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg);}
+        100% { transform: rotate(360deg);}
+    }
+
+    /* --- FIX: Restored original centering styles AND background --- */
+    #IdleAnimation {
+        /* These 4 lines are your original centering styles */
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        
+        /* This makes the ::before pseudo-element visible */
+        background:transparent;
+        /* --- FIX: z-index 7 puts it above the player (1) and loader (8 is hidden) --- */
+        z-index:7; 
+        
+        /* This is needed for the ::before element */
+        position: fixed; 
+    }
+
+    .idle-branding {
+        text-align:center;
+        margin-bottom:40px;
+    }
+
+    .idle-branding h1 {
+        font-size:3rem;
+        font-weight:900;
+        letter-spacing:1px;
+    }
+
+    .idle-branding p {
+        font-size:1.5rem;
+        font-weight:300;
+        color:var(--text-secondary);
+        letter-spacing:2px;
+    }
+
+    #PlayButton {
+        width:100px;
+        height:100px;
+        border-radius:50%;
+        background:rgba(255,255,255,0.1);
+        border:2px solid white;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        transition:transform .2s, background .2s;
+    }
+
+    #PlayButton svg {
+        width:50px;
+        height:50px;
+        fill:white;
+        margin-left:8px;
+    }
+
+    /* --- PATCH: This is the background image element --- */
+    #IdleAnimation::before {
+      content: '';
+      /* --- FIX: Use position: absolute to stay inside the parent --- */
+      position: absolute; 
+      top: 0; left: 0; width: 100%; height: 100%;
+      
+      background-image: url('https://static0.gamerantimages.com/wordpress/wp-content/uploads/2025/04/sung-jinwoo-solo-leveling.jpg');
+      background-size: cover;
+      background-position: center;
+      background-color: var(--bg-primary); /* Fallback color */
+      
+      opacity: 0;
+      transition: opacity 0.8s ease-in;
+      
+      /* --- FIX: Use z-index: 1 --- */
+      z-index: 1; 
+      
+      /* --- FIX: Prevent the background from catching clicks --- */
+      pointer-events: none;
+    }
+
+    /* --- FIX: Give content a higher z-index to appear on top --- */
+    .idle-branding,
+    #PlayButton {
+        position: relative; /* Create stacking context */
+        z-index: 2; /* Higher than the ::before's z-index: 1 */
+    }
+
+    /* When IdleAnimation is visible, fade in the background */
+    #IdleAnimation:not(.HIDDEN)::before {
+      opacity: 1;
+    }
+    /* --- END OF IDLE SCREEN PATCH --- */
+
+
+    /* ------------------------- PANELS (NAV & SETTINGS) - overlay slide-out panels ------------------------- */
+    #nav, #ChannelSettings {
+        position: fixed;
+        top: 0;
+        height: 100vh;
+        width: 320px;
+        max-width: 80%;
+        background: var(--bg-panel);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 30;
+        transition: transform var(--anim-time-fast) ease-out, visibility var(--anim-time-fast) ease-out;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        display:flex;
+        flex-direction:column;
+    }
+
+    /* Left Nav Panel (slide in from left) */
+    #nav {
+        left: 0;
+        transform: translateX(-100%);
+        visibility: hidden;
+    }
+
+    #nav.visible {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    /* Right Settings Panel (slide in from right) */
+    #ChannelSettings {
+        right: 0;
+        transform: translateX(100%);
+        visibility: hidden;
+    }
+
+    #ChannelSettings.visible {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    #brand-header {
+        display:flex;
+        align-items:center;
+        padding:15px;
+        height:64px;
+        border-bottom:1px solid var(--border-color);
+        flex-shrink:0;
+    }
+
+    #brand-header svg {
+        width:24px;
+        height:24px;
+        margin-right:10px;
+    }
+
+    #brand-header span {
+        font-size:1.2rem;
+        font-weight:600;
+    }
+
+    #search_item_wrapper {
+        padding:15px;
+        border-bottom:1px solid var(--border-color);
+        flex-shrink:0;
+    }
+
+    #SearchField {
+        width:100%;
+        padding:10px;
+        background:var(--bg-secondary);
+        border:1px solid var(--border-color);
+        color:var(--text-primary);
+        border-radius:5px;
+        font-size:1rem;
+    }
+
+    #SearchField:focus {
+        outline:none;
+        border-color:var(--bg-focus);
+        box-shadow: 0 0 5px var(--bg-focus);
+    }
+
+    /* Panel slide container (Groups/Channels) */
+    #list_container_scrollarea {
+        flex-grow:1;
+        min-height:0;
+        overflow:hidden;
+    }
+
+    #list_container {
+        display:flex;
+        width:200%; 
+        height:100%;
+        /* This shows the ChannelList (the 2nd element) by default 
+          by shifting the 200% wide container 50% to the left.
+        */
+        transform: translateX(-50%); 
+        transition: transform var(--anim-time-fast) ease-out;
+    }
+
+    #list_container.groups-opened {
+        /* This shows the GroupList (the 1st element) by sliding
+          the container back to its original 0 position.
+        */
+        transform: translateX(0); 
+    }
+
+    #GroupList, #ChannelList {
+        width:50%; /* Each pane takes up half of the 200% container */
+        height:100%;
+        padding:10px 0;
+        flex-shrink: 0; 
+    }
+
+    /* --- FIX: Restored Settings Container for submenu --- */
+    #settings_container {
+        position:relative;
+        width:100%;
+        height:100%;
+        overflow:hidden;
+    }
+
+    #SettingsMainMenu, #SettingsVideoFormatMenu {
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        padding:10px;
+        transition: transform var(--anim-time-fast) ease-out;
+    }
+
+    #SettingsMainMenu {
+        transform: translateX(0);
+        padding-top: 60px;
+    }
+
+    #SettingsVideoFormatMenu {
+        transform: translateX(100%);
+    }
+
+    #settings_container.submenu-visible #SettingsMainMenu {
+        transform: translateX(-100%);
+    }
+
+    #settings_container.submenu-visible #SettingsVideoFormatMenu {
+        transform: translateX(0);
+    }
+    /* --- END FIX --- */
+
+
+    /* ------------------------- LISTS & ITEMS ------------------------- */
+    #main_nav {
+        list-style:none;
+        padding:0;
+        /* --- FIX: Removed display:flex to make items stack vertically --- */
+    }
+
+    #main_nav li {
+        padding:15px 20px;
+        font-size:1rem;
+        font-weight:500;
+        cursor:pointer;
+        transition:background .2s;
+        border-radius:5px;
+        margin:2px 5px; 
+    }
+
+    #DynamicGroupsList {
+        list-style:none;
+        padding:0;
+        display: block; 
+    }
+
+    #DynamicGroupsList li {
+        padding:15px 20px;
+        font-size:1rem;
+        font-weight:500;
+        cursor:pointer;
+        transition:background .2s;
+        border-radius:5px;
+        margin:2px 5px; 
+        display: block; 
+    }
+
+    .list_headline {
+        font-size:0.9rem;
+        color:var(--text-secondary);
+        padding:10px 20px;
+        text-transform:uppercase;
+        cursor: pointer; 
+    }
+
+    .HR {
+        margin:16px 6px;
+        height:1px;
+        background:var(--primary-gradient);
+    }
+
+    .channel-item {
+        display:flex;
+        align-items:center;
+        padding:8px 10px;
+        cursor:pointer;
+        height:60px; 
+        border-radius:5px;
+        margin:2px 5px;
+    }
+
+    .nav_logo {
+        width:40px; 
+        height:40px; 
+        margin-left:auto; 
+        margin-right:10px; 
+        flex-shrink:0;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .nav_logo img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; 
+    }
+
+    .fav-star {
+        width:20px;
+        color:#ffc107;
+        font-size:0.8em;
+    }
+
+    .list-ch {
+        width:40px;
+        color:var(--text-secondary);
+        font-weight:500;
+        text-align:right;
+        margin-right:10px;
+        flex-shrink:0;
+    }
+
+    .list-title {
+        flex-grow:1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+
+    /* Settings Items */
+    .settings-item {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:18px 15px;
+        font-size:1rem;
+        cursor:pointer;
+        border-radius:5px;
+        margin:2px 5px;
+    }
+
+    .settings-item-header {
+        font-size:1.1rem;
+        font-weight:600;
+        padding:15px;
+        border-bottom:1px solid var(--border-color);
+        margin-bottom:10px;
+    }
+
+    #main_nav li:hover, #DynamicGroupsList li:hover, .channel-item:hover, .settings-item:hover {
+        background:var(--bg-hover);
+    }
+
+    #main_nav li.selected, #DynamicGroupsList li.selected, .channel-item.selected, .settings-item.selected {
+        background:var(--bg-selected);
+        font-weight:600;
+    }
+
+    #SearchField:focus, #main_nav li:focus-visible, #DynamicGroupsList li:focus-visible, .channel-item:focus-visible, .settings-item:focus-visible, .modal-selectable:focus-visible, .close-button:focus-visible, #PlayButton:focus-visible {
+        outline: 2px solid var(--bg-focus);
+        outline-offset: -2px;
+        box-shadow: 0 0 10px var(--bg-focus);
+    }
+
+    /* Focus outline for modal buttons (CANCEL/SAVE/CLOSE) */
+    .popup-buttons button.modal-selectable.selected {
+        outline: 2px solid var(--bg-focus);
+        outline-offset: -2px;
+        box-shadow: 0 0 10px var(--bg-focus);
+    }
+
+    /* --- PATCH: Added rule for selected input fields --- */
+    .edit-modal-field.modal-selectable.selected {
+        outline: 2px solid var(--bg-focus);
+        outline-offset: -2px;
+        box-shadow: 0 0 10px var(--bg-focus);
+    }
+
+
+    .channel-item.playing {
+        border-left:3px solid var(--bg-focus);
+        padding-left:7px;
+        font-weight:600;
+        color:var(--text-primary);
+    }
+
+    /* ------------------------- CHANNEL INFO ------------------------- */
+    #ChannelInfo {
+        position: fixed;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%) translateY(200px);
+        background: var(--bg-panel);
+        border-radius:10px;
+        display:flex;
+        align-items:center;
+        padding:15px 20px;
+        z-index:9;
+        opacity:0;
+        visibility:hidden;
+        transition: transform .3s, opacity .3s, visibility .3s;
+    }
+
+    #ChannelInfo.visible {
+        transform: translateX(-50%) translateY(0);
+        opacity:1;
+        visibility:visible;
+    }
+
+    /* --- FIX: Added styles for Channel Info box --- */
+    #ch_logo {
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        margin-right: 15px;
+    }
+
+    #ch_logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    #channel_text_container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #channel_name {
+        font-size: 1.2em;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    #channel_epg {
+        font-size: 0.9em;
+        color: var(--text-secondary);
+    }
+    /* --- END FIX --- */
+
+
+    /* ------------------------- MODALS (GUIDE, EPG, SETTINGS) ------------------------- */
+    .fullscreen-popup {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        width:90%;
+        max-width:500px;
+        background:var(--bg-panel-solid);
+        border:1px solid var(--border-color);
+        border-radius:10px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.5);
+        max-height:80vh;
+        
+        /* --- FIX: Added flex properties to manage inner scrolling --- */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Remove outer scrollbar */
+    }
+
+    .close-button {
+        position:absolute;
+        top:10px;
+        right:10px;
+        width:30px;
+        height:30px;
+        background:none;
+        border:none;
+        color:var(--text-secondary);
+        font-size:1.5rem;
+        cursor:pointer;
+        line-height:30px;
+        text-align:center;
+    }
+
+    .close-button::before {
+        content: '×';
+    }
+
+    .close-button:hover {
+        color:var(--text-primary);
+    }
+
+    #Guide .fullscreen-popup {
+        max-width:800px;
+        padding:30px;
+    }
+
+    /* --- FIX: z-index must be higher than nav (30) --- */
+    #Guide {
+        z-index: 35;
+    }
+
+    #EpgOverlay {
+        display:grid;
+        grid-template-columns: 300px 1fr;
+        grid-template-rows: 100%;
+        background:var(--bg-overlay);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        /* --- FIX: z-index must be higher than nav (30) --- */
+        z-index: 35;
+        padding: 5vh 5vw;
+        gap: 10px;
+    }
+
+    #EpgChannels {
+        background: var(--bg-panel);
+        border-radius:5px;
+        height:100%;
+    }
+
+    #EpgTimeline {
+        background: var(--bg-panel);
+        border-radius:5px;
+        height:100%;
+    }
+
+    /* Settings Modal content */
+    #SettingsModal {
+        background: transparent;
+        z-index: 35;
+    }
+
+    #SettingsModal h2 {
+        padding: 20px 25px;
+        font-size: 1.3rem;
+        border-bottom:1px solid var(--border-color);
+    }
+
+    /* --- FIX: Added this new rule for the modal content area --- */
+    #SettingsModalContent {
+        flex-grow: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .popup-content-list {
+        list-style:none;
+        padding:10px;
+        /* --- FIX: Make this the primary scrolling element --- */
+        overflow-y: auto;
+        flex-grow: 1; 
+        min-height: 0;
+    }
+
+    .popup-content-list li {
+        padding:18px 20px;
+        font-size:1rem;
+        cursor:pointer;
+        border-radius:5px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+    }
+
+    .popup-content-list li:hover {
+        background:var(--bg-hover);
+    }
+
+    .popup-content-list li.selected {
+        background:var(--bg-selected);
+        font-weight:600;
+    }
+
+    .popup-content-list li input[type="radio"] {
+        transform:scale(1.2);
+        accent-color:var(--bg-focus);
+        pointer-events:none;
+    }
+
+    .popup-buttons {
+        padding:15px;
+        text-align:right;
+        border-top:1px solid var(--border-color);
+    }
+
+    .popup-buttons button {
+        padding:10px 20px;
+        background:var(--bg-secondary);
+        border:1px solid var(--border-color);
+        color:var(--text-primary);
+        border-radius:5px;
+        cursor:pointer;
+        margin-left:10px;
+    }
+
+    .popup-buttons button:hover {
+        background:var(--bg-hover);
+    }
+
+    .edit-modal-field {
+        width:100%;
+        padding:10px;
+        background:var(--bg-secondary);
+        border:1px solid var(--border-color);
+        color:var(--text-primary);
+        border-radius:5px;
+        font-size:1rem;
+        margin-top:5px;
+        margin-bottom:15px;
+    }
+
+    .edit-modal-field:focus {
+        outline:none;
+        border-color:var(--bg-focus);
+    }
+
+    /* Temp Message */
+    #TempMessageOverlay {
+        position: fixed;
+        bottom:50px;
+        left:50%;
+        transform:translateX(-50%);
+        background:var(--bg-panel-solid);
+        border:1px solid var(--border-color);
+        padding:15px 25px;
+        border-radius:8px;
+        z-index:40;
+        font-size:1.1rem;
+        opacity:0;
+        visibility:hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    #TempMessageOverlay.visible {
+        opacity:1;
+        visibility:visible;
+    }

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shakzz TV Player v2</title>
+
+  <!-- Shaka Player -->
+  <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.7.13/dist/shaka-player.ui.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@4.7.13/dist/controls.css" />
+ <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#000000" />
+</head>
+<body>
+  <!-- PLAYER CONTAINER -->
+  <div id="playerContainer" tabindex="-1" aria-label="Video Player Container">
+    <video id="avplayer" autoplay muted playsinline></video>
+
+    <div id="StreamInfoOverlay" class="HIDDEN" aria-hidden="true"></div>
+
+    <div id="ChannelLoader" class="HIDDEN" role="status" aria-live="polite">
+      <div class="loader-content">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <span class="loading-text" id="loading-channel-name">Loading Channel...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global overlays -->
+  <div id="BlurOverlay" class="fullscreen" aria-hidden="true"></div>
+  <div id="TempMessageOverlay" class="HIDDEN" aria-hidden="true"></div>
+
+  <!-- UI ELEMENTS (panels / modals / sidebars) -->
+  <div id="ui_elements">
+    <!-- Idle / Home state -->
+    <div id="IdleAnimation" class="fullscreen" aria-hidden="false">
+      <div class="idle-branding" role="presentation">
+        <h1>SHAKZZ TV</h1>
+        <p>FOR FREE</p>
+      </div>
+
+      <div id="PlayButton" title="Play" role="button" tabindex="0" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8,5.14V19.14L19,12.14L8,5.14Z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LEFT NAV: slide-out panel -->
+    <nav id="nav" aria-label="Main Navigation" role="navigation">
+      <div id="brand-header">
+        <svg viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M21,3H3C1.89,3,1,3.89,1,5V17C1,18.11,1.89,19,3,19H8V21H16V19H21
+                     C22.11,19,23,18.11,23,17V5C23,3.89,22.11,3,21,3M21,17H3V5H21V17
+                     M16,11L11,15V7L16,11Z"></path>
+        </svg>
+        <span>Shakzz TV</span>
+      </div>
+
+      <div id="search_item_wrapper">
+        <input id="SearchField" type="search" placeholder="Search" aria-label="Search Channels" />
+      </div>
+
+      <div id="list_container_scrollarea" role="region" aria-label="Channels and Groups">
+        <div id="list_container">
+          <section id="GroupList" class="custom-scrollbar" tabindex="0" aria-label="Group List">
+            <!-- 
+              FIX: This is the user's requested order: GUIDE, EPG, then CATEGORIES.
+            -->
+            <ul id="main_nav" role="tablist" aria-label="Main Tabs">
+              <li id="guide_button" role="tab" tabindex="-1" aria-selected="false">GUIDE</li>
+              <li id="epg_button" role="tab" class="selected" tabindex="0" aria-selected="true">EPG</li>
+            </ul>
+
+            <div class="HR" aria-hidden="true"></div>
+
+            <h2 class="list_headline">CATEGORIES</h2>
+
+            <ul id="DynamicGroupsList" role="list" aria-label="Channel Categories">
+              <!-- Categories populated dynamically by script -->
+            </ul>
+          </section>
+
+          <section id="ChannelList" class="custom-scrollbar" tabindex="0" aria-label="Channel List">
+            <!-- Channel items populated dynamically by script -->
+          </section>
+        </div>
+      </div>
+    </nav>
+
+    <!-- RIGHT PANEL: Channel Settings -->
+    <aside id="ChannelSettings" aria-label="Channel Settings" role="complementary">
+      <!-- 
+        FIX: Restored the original slide-out container structure
+      -->
+      <div id="settings_container">
+        <div id="SettingsMainMenu" class="custom-scrollbar" role="region" aria-label="Settings Main Menu"></div>
+        <div id="SettingsVideoFormatMenu" class="custom-scrollbar" role="region" aria-label="Video Format Menu"></div>
+      </div>
+    </aside>
+
+    <!-- CHANNEL INFO floating box -->
+    <div id="ChannelInfo" aria-hidden="true" role="status">
+      <div id="ch_logo" aria-hidden="true"></div>
+      <div id="channel_text_container">
+        <div id="channel_name"></div>
+        <div id="channel_epg"></div>
+      </div>
+    </div>
+
+    <!-- GUIDE Modal (centered popup) -->
+    <div id="Guide" class="fullscreen HIDDEN" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <div class="fullscreen-popup" role="document">
+        <button class="close-button" onclick="hideGuide()" aria-label="Close Guide" type="button"></button>
+        <div id="GuideContent" role="region" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- EPG Overlay (grid layout) -->
+    <div id="EpgOverlay" class="fullscreen HIDDEN" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="epg-title">
+      <div id="EpgChannels" class="custom-scrollbar" role="region" aria-label="EPG Channels"></div>
+      <div id="EpgTimeline" class="custom-scrollbar" role="region" aria-label="EPG Timeline"></div>
+    </div>
+
+    <!-- Settings Modal (centered popup) -->
+    <div id="SettingsModal" class="fullscreen HIDDEN" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="fullscreen-popup" role="document">
+        <button class="close-button" onclick="hideSettingsModal()" aria-label="Close Settings" type="button"></button>
+        <div id="SettingsModalContent" role="region"></div>
+      </div>
+    </div>
+  </div>
+ <script src="script.js" defer></script>
+  </body>
+</html>
