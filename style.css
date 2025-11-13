@@ -61,15 +61,19 @@
   border-radius: 0; /* optional: keep sharp edges for TVs */
 }
 
-/* --- VIDEO ELEMENT (JS will inject !important object-fit and transform here) --- */
-#jwplayer-container video {
-  width: 100%;
-  height: auto;
-  /* Removed static object-fit: contain; to allow JS !important override */
+/* --- FIX: Target the video element directly using the highest specificity and !important --- */
+/* This forces the original aspect ratio (contain) unless JS overrides it. */
+#jwplayer-container .jw-wrapper video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important; /* Forces Original/Fit by default */
+  transform: scale(1) !important;
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   opacity: 1;
   background-color: #000;
 }
+/* ------------------------------------------------------------------------------------------ */
+
 
 /* --- HIDE DEFAULT JWPLAYER CONTROLS --- */
 .jw-controls {
