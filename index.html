@@ -548,8 +548,8 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
-            /* visibility: hidden; REMOVED FOR STATIC HTML */
-            /* opacity: 0; REMOVED FOR STATIC HTML */
+            visibility: hidden; 
+            opacity: 0; 
             transition: opacity 0.3s ease, visibility 0.3s ease;
             display: none; /* Default hide for static HTML */
         }
@@ -899,7 +899,7 @@
             width: 92%;
             padding: 12px 16px;
             border-radius: 12px;
-            display: none; /* Hiding since JS is removed */
+            display: flex; /* Restored display flex */
             align-items: center;
             justify-content: space-between;
             font-weight: 600;
@@ -918,53 +918,43 @@
 
         /* --- SCROLL REVEAL CSS ADDITIONS: Directional Fade-In --- */
         
-        /* Base state for animation start. IMPORTANT: Removing opacity/visibility override for static HTML */
+        /* Base hidden state and transition (APPLES TO ALL .scroll-reveal) */
         .scroll-reveal {
-            /* opacity: 0; /* REMOVED to make text visible in static HTML mode */
-            transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            opacity: 0; /* Restored hidden state */
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
             will-change: opacity, transform;
-            /* visibility: hidden; REMOVED to make text visible in static HTML mode */
+            visibility: hidden; /* Restored hidden state */
         }
         
         /* 1. Pop-Up Animation (FOR MAIN SECTION HEADINGS - h2, and entire section wrapper) */
         .info-section > .container > .lg-heading.scroll-reveal,
         .contact-social > .lg-heading.scroll-reveal,
         .info-section.scroll-reveal {
-            /* transform: translateY(20px) scale(0.98); REMOVED for visibility */
+            transform: translateY(20px) scale(0.98); /* Restored pop up start position */
         }
 
         /* 2. Alternating Slide Animation (FOR ALL DIRECT CHILD ELEMENTS OF .container EXCEPT h2) */
         .info-section > .container > .scroll-reveal:not(.lg-heading), 
-        .contact-social > .scroll-reveal:not(.lg-heading), /* Target p, h3, ul inside contact-social */
-        .contact-form form > * /* Target direct children of the form */
+        .contact-social > .scroll-reveal:not(.lg-heading), 
+        .contact-form form > *
         {
-            /* transform: translateX(-50px); REMOVED for visibility */
-            /* opacity: 0; REMOVED for visibility */
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out; 
+            /* Default to sliding from left */
+            transform: translateX(-80px); /* Restored left start position */
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
         }
 
         /* Slide from Right (Even-numbered direct children of the container/form) */
         .info-section > .container > .scroll-reveal:not(.lg-heading):nth-child(even),
         .contact-form form > *:nth-child(even) {
-            /* transform: translateX(50px); REMOVED for visibility */
+            transform: translateX(80px); /* Restored right start position */
         }
 
         /* Active State: Reset transform and opacity */
         .scroll-reveal.active {
             opacity: 1;
-            transform: translate(0, 0) scale(1);
+            transform: translate(0, 0) scale(1); /* Final position */
             visibility: visible;
-        }
-
-        /* --- RESTORED VISIBILITY FOR STATIC HTML --- */
-        /* Since JS is gone, we must manually ensure all text starts visible, which means removing the initial hidden state */
-        .scroll-reveal,
-        .info-section > .container > .scroll-reveal:not(.lg-heading), 
-        .contact-social > .scroll-reveal:not(.lg-heading),
-        .contact-form form > * {
-            opacity: 1;
-            visibility: visible;
-            transform: none;
         }
 
         /* --- Mobile Responsive Overrides --- */
@@ -1031,8 +1021,7 @@
         </div>
     </header>
 
-    <div id="liveNotificationBanner" class="modal-overlay info">
-        <!-- Kept modal-overlay class for styling consistency, but display:none in CSS -->
+    <div id="liveNotificationBanner" class="notification-banner info hide">
         <div class="notification-content">
             <i class="fas fa-broadcast-tower"></i>
             <span id="notificationMessage">🎥 LIVE: We've just added 5 new channels to the 'Movies' category!</span>
@@ -1078,15 +1067,7 @@
             </div>
 
             <div class="category-bar">
-                <!-- Static Category Buttons (1st button active) -->
-                <button class="category-button active" data-category="all">All</button>
-                <button class="category-button" data-category="favorites">Favorites</button>
-                <button class="category-button" data-category="news">News</button>
-                <button class="category-button" data-category="entertainment">Entertainment</button>
-                <button class="category-button" data-category="movies">Movies</button>
-                <button class="category-button" data-category="sports">Sports</button>
-                <button class="category-button" data-category="documentary">Documentary</button>
-                <button class="category-button" data-category="cartoons & animations">Cartoons & Animations</button>
+                <!-- Buttons rendered by JS -->
             </div>
 
             <button id="clearFavoritesBtn" class="clear-fav-btn" style="display:none;">
@@ -1100,27 +1081,7 @@
 
             <div class="scrollable-list">
                 <div class="channel-list" id="channelList">
-                    <!-- Placeholder Channel Buttons -->
-                    <button class="channel-button" data-key="PBBMain">
-                        <img src="https://placehold.co/30x30/0000FF/FFFFFF?text=L1" alt="Channel Logo" class="channel-logo">
-                        <span class="channel-name">PBB Main</span>
-                        <span class="favorite-star">☆</span>
-                    </button>
-                    <button class="channel-button" data-key="discoveryscience">
-                        <img src="https://placehold.co/30x30/FF0000/FFFFFF?text=L2" alt="Channel Logo" class="channel-logo">
-                        <span class="channel-name">Discovery Science</span>
-                        <span class="favorite-star active">⭐</span>
-                    </button>
-                    <button class="channel-button" data-key="KidoodleTV">
-                        <img src="https://placehold.co/30x30/00FF00/FFFFFF?text=L3" alt="Channel Logo" class="channel-logo">
-                        <span class="channel-name">Kidoodle TV</span>
-                        <span class="favorite-star">☆</span>
-                    </button>
-                    <button class="channel-button" data-key="jeepneytv">
-                        <img src="https://placehold.co/30x30/FFFF00/000000?text=L4" alt="Channel Logo" class="channel-logo">
-                        <span class="channel-name">Jeepney TV</span>
-                        <span class="favorite-star">☆</span>
-                    </button>
+                    <!-- Channels rendered by JS -->
                 </div>
             </div>
         </div>
@@ -1129,7 +1090,6 @@
     <section id="about-us" class="info-section scroll-reveal">
         <div class="container">
             <h2 class="lg-heading scroll-reveal">About Shakzz TV</h2>
-            <!-- These elements are now visible due to CSS fix -->
             <p class="scroll-reveal">Shakzz TV delivers a premier, curated portfolio of local and international networks, providing a seamless, high-quality streaming experience available 24/7. Our platform offers a comprehensive spectrum of programming designed to cater to every interest—from breaking news and live sports to insightful documentaries and engaging animation.</p>
             
             <h3 class="scroll-reveal">Our Vision & Commitment</h3>
@@ -1201,7 +1161,6 @@
     <section id="privacy-policy" class="info-section scroll-reveal">
         <div class="container">
             <h2 class="lg-heading scroll-reveal">Privacy Policy</h2>
-            <!-- These elements are now visible due to CSS fix -->
             <p class="scroll-reveal">At Shakzz TV, your privacy is paramount. This policy outlines how we collect, use, and protect your information. By using our service, you agree to the collection and use of information in accordance with this policy.</p>
             
             <h3 class="scroll-reveal">Information We Collect</h3>
@@ -1285,5 +1244,596 @@
     <!-- Back to top button is present but hidden by default in CSS without JS -->
     <button id="backToTopBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
 
+    <script type="module">
+        // --- CHANNEL DATA (RESTORED) ---
+        const channels = {
+            PBBMain: {
+                name: "PBB Main",
+                type: "clearkey",
+                manifestUri: "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-pbb-live-dash-abscbnono/index.mpd",
+                logo: "https://i.imgur.com/n5rdR3v.png",
+                group: ["entertainment"],
+            },
+
+            PBBDiningArea: {
+                name: "PBB Dining Area",
+                type: "clearkey",
+                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/pbb1/manifest.mpd",
+                logo: "https://i.imgur.com/n5rdR3v.png",
+                keyId: "b37bb823fe48452eba8cee62516f5da1",
+                key: "8b48cec6bce94917e4c39c381d607102",
+                group: ["entertainment"],
+            },
+
+            PBBPoolArea: {
+                name: "PBB Pool Area",
+                type: "clearkey",
+                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/pbb2/manifest.mpd",
+                logo: "https://i.imgur.com/n5rdR3v.png",
+                keyId: "9539027a7c42446a8648555af3bb3095",
+                key: "1cb94c88f68bef1e728cfa4677e1eeca",
+                group: ["entertainment"],
+            },
+
+            discoveryscience: {
+                name: "Discovery Science",
+                type: "clearkey",
+                manifestUri: "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/Discoveryscience2/default/manifest.mpd",
+                keyId: "5458f45efedb4d6f8aa6ac76c85b621b",
+                key: "dbf8a0a306a64525ba3012fd225370c0",
+                logo: " https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkA_8vr9UZUhtkaFi6AshM83zQwhPWBGWX-Q&s",
+                group: ["documentary"],
+            },
+            KidoodleTV: {
+                name: "Kidoodle TV",
+                type: "hls",
+                manifestUri: "https://amg07653-apmc-amg07653c5-samsung-ph-8539.playouts.now.amagi.tv/playlist.m3u8",
+                logo: "https://d1iiooxwdowqwr.cloudfront.net/pub/appsubmissions/20201230211817_FullLogoColor4x.png",
+                group: ["cartoons & animations"],
+            },
+            StrawberryShortcake: {
+                name: "Strawberry Shortcake",
+                type: "hls",
+                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258006/hls/master.m3u8?ads.xumo_channelId=88258006",
+                logo: "https://upload.wikimedia.org/wikipedia/en/f/ff/Strawberry_Shortcake_2003_Logo.png",
+                group: ["cartoons & animations"],
+            },
+            SonictheHedgehog: {
+                name: "Sonic the Hedgehog",
+                type: "hls",
+                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258004/hls/master.m3u8?ads.xumo_channelId=88258004",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Sonic_The_Hedgehog.svg/1200px-Sonic_The_Hedgehog.svg.png",
+                group: ["cartoons & animations"],
+            },
+            SuperMario: {
+                name: "Super Mario",
+                type: "hls",
+                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258005/hls/master.m3u8?ads.xumo_channelId=88258005",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFkMkkUmZBGslGWGZMN2er5emlnqGCCU49wg&s",
+                group: ["cartoons & animations"],
+            },
+            Teletubbies: {
+                name: "Teletubbies",
+                type: "hls",
+                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258003/hls/master.m3u8?ads.xumo_channelId=88258003",
+                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Teletubbies_Logo.png/330px-Teletubbies_Logo.png",
+                group: ["cartoons & animations"],
+            },
+            anione: {
+                name: "Ani One",
+                type: "hls",
+                manifestUri: "https://amg19223-amg19223c9-amgplt0019.playout.now3.amagi.tv/playlist/amg19223-amg19223c9-amgplt0019/playlist.m3u8",
+                logo: "https://www.medialink.com.hk/img/ani-one-logo.jpg",
+                group: ["cartoons & animations"],
+            },
+            
+            jeepneytv: {
+                name: "Jeepney TV",
+                type: "clearkey",
+                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/jeepneytv/manifest.mpd",
+                keyId: "90ea4079e02f418db7b170e8763e65f0",
+                key: "1bfe2d166e31d03eee86ee568bd6c272",
+                logo: "https://upload.wikimedia.org/wikipedia/en/1/15/Jeepney_TV_Logo_2015.svg",
+                group:["entertainment"],
+            },
+            
+            aniplus: {
+                name: "Aniplus",
+                type: "hls",
+                manifestUri: "https://amg18481-amg18481c1-amgplt0352.playout.now3.amagi.tv/playlist/amg18481-amg18481c1-amgplt0352/playlist.m3u8",
+                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJj494OpI0bKrTrvcHqEkzMYzqtfLNdWjQrg&s",
+                group: ["cartoons & animations"],
+            },
+            
+            sinemanila: {
+                name: "SineManila",
+                type: "hls",
+                manifestUri: "https://live20.bozztv.com/giatv/giatv-sinemanila/sinemanila/chunks.m3u8",
+                logo: "https://raw.githubusercontent.com/Shakzz890/LoidForger/main/SineManila.png",
+                group:["movies", "entertainment"],
+            },
+        };
+
+        // --- GLOBAL VARIABLES ---
+        let shownCount = 0;
+        let currentSearchFilter = "";
+        let currentChannelKey = Object.keys(channels)[0];
+        const tabs = ["all", "favorites", "news", "entertainment", "movies", "sports", "documentary", "cartoons & animations"];
+        let currentTabIndex = 0;
+        let sortedChannels = [];
+        
+        window.onbeforeunload = () => window.scrollTo(0, 0);
+
+        // Setting a mock user ID
+        const displayUserId = document.getElementById('displayUserId');
+        if (displayUserId) {
+            displayUserId.textContent = 'MOCK_USER_ID_123456';
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function resetChannelListScroll() {
+            const scrollableListContainer = document.querySelector(".scrollable-list");
+            if (scrollableListContainer) scrollableListContainer.scrollTop = 0;
+        }
+
+        function getOrCreateDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = window.crypto?.randomUUID?.() || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        // --- VIEWER COUNT (RESTORED) ---
+        async function updateViewerCount() {
+            try {
+                const deviceId = getOrCreateDeviceId();
+                // This API endpoint is a mock
+                const res = await fetch(`/api/viewers?deviceId=${deviceId}`);
+                const data = await res.json();
+                const viewerCountEl = document.getElementById('viewerCountText');
+                if (viewerCountEl) viewerCountEl.innerText = data.count || 0;
+            } catch (e) {
+                // Mock fallback if API fails
+                const viewerCountEl = document.getElementById('viewerCountText');
+                if (viewerCountEl && viewerCountEl.innerText === '0') viewerCountEl.innerText = '99+'; 
+            }
+        }
+
+        // --- FAVORITES STORAGE HANDLER (RESTORED) ---
+        function loadFavoritesFromStorage() {
+            const stored = JSON.parse(localStorage.getItem("favoriteChannels") || "[]");
+            Object.entries(channels).forEach(([key, channel]) => {
+                channel.favorite = stored.includes(key);
+            });
+        }
+
+        function saveFavoritesToStorage() {
+            const favorites = Object.entries(channels)
+                .filter(([key, ch]) => ch.favorite)
+                .map(([key]) => key);
+            localStorage.setItem("favoriteChannels", JSON.stringify(favorites));
+        }
+
+        function clearAllFavorites() {
+            Object.values(channels).forEach(ch => ch.favorite = false);
+            localStorage.removeItem("favoriteChannels");
+            renderChannelButtons(currentSearchFilter);
+            console.log("All favorites cleared. ⭐"); 
+        }
+
+        // --- CHANNEL RENDERING (RESTORED) ---
+        function renderChannelButtons(filter = "") {
+            currentSearchFilter = filter;
+            const list = document.getElementById("channelList");
+            if (!list) return;
+            list.innerHTML = "";
+            shownCount = 0;
+
+            const selectedGroup = tabs[currentTabIndex];
+            const fragment = document.createDocumentFragment();
+
+            sortedChannels.forEach(([key, channel]) => {
+                const group = channel.group || "live";
+                const matchesSearch = channel.name.toLowerCase().includes(filter.toLowerCase());
+                const matchesFavorites = (selectedGroup === "favorites") ? channel.favorite === true : true;
+                const matchesGroup =
+                    selectedGroup === "all" ||
+                    selectedGroup === "favorites" ||
+                    (Array.isArray(group) ? group.includes(selectedGroup) : group === selectedGroup);
+
+                if (!matchesSearch || !matchesGroup || !matchesFavorites) return;
+
+                const btn = document.createElement("button");
+                btn.className = "channel-button"; 
+                btn.setAttribute("data-key", key);
+
+                const logo = document.createElement("img");
+                logo.src = channel.logo;
+                logo.alt = channel.name;
+                logo.className = "channel-logo";
+                logo.onerror = function() { this.src = 'https://placehold.co/30x30/2b2b2b/FFFFFF?text=TV'; };
+
+
+                const nameSpan = document.createElement("span");
+                nameSpan.className = "channel-name";
+                nameSpan.textContent = channel.name;
+
+                // --- FAVORITE STAR ---
+                const favStar = document.createElement("span");
+                favStar.className = `favorite-star ${channel.favorite ? 'active' : ''}`;
+                favStar.innerHTML = channel.favorite ? "⭐" : "☆";
+                favStar.onclick = (e) => {
+                    e.stopPropagation();
+                    channel.favorite = !channel.favorite;
+                    favStar.innerHTML = channel.favorite ? "⭐" : "☆";
+                    saveFavoritesToStorage();
+                    if (selectedGroup === 'favorites') {
+                        renderChannelButtons(currentSearchFilter);
+                    } else {
+                        favStar.classList.toggle('active', channel.favorite);
+                    }
+                };
+
+                btn.appendChild(logo);
+                btn.appendChild(nameSpan);
+                btn.appendChild(favStar);
+                btn.onclick = () => loadChannel(key);
+
+                fragment.appendChild(btn);
+                shownCount++;
+            });
+
+            list.appendChild(fragment);
+
+            const countDisplay = document.getElementById("channelCountText");
+            const channelCountContainer = document.getElementById("channelCount");
+            if (countDisplay && channelCountContainer) {
+                countDisplay.textContent = `${shownCount} channel${shownCount !== 1 ? "s" : ""} found`;
+                if (shownCount > 0) channelCountContainer.classList.add("rainbow-text");
+                else channelCountContainer.classList.remove("rainbow-text");
+            }
+
+            const clearBtnEls = document.querySelectorAll('#clearFavoritesBtn'); 
+            clearBtnEls.forEach(btn => {
+                if (!btn) return;
+                btn.style.display = (selectedGroup === "favorites" && shownCount > 0) ? "block" : "none";
+            });
+        }
+
+        // --- LOAD CHANNEL (RESTORED) ---
+        function loadChannel(key) {
+            const channel = channels[key];
+            if (!channel) return console.error(`Channel "${key}" not found`);
+
+            currentChannelKey = key;
+            renderChannelButtons(currentSearchFilter);
+
+            const nowPlayingEl = document.getElementById("nowPlayingChannel");
+            if (nowPlayingEl) {
+                nowPlayingEl.textContent = channel.name;
+                const overlay = document.getElementById("nowPlayingOverlay");
+                if (overlay) {
+                    overlay.classList.add("now-playing-animate");
+                    setTimeout(() => overlay.classList.remove("now-playing-animate"), 350);
+                }
+            }
+
+            const drmConfig = {};
+            let playerType = "hls";
+
+            if (channel.type === "widevine") {
+                drmConfig.widevine = { url: channel.licenseServerUri };
+                playerType = "dash";
+            } else if (channel.type === "clearkey") {
+                if (channel.keyId && channel.key) {
+                    drmConfig.clearkey = { keyId: channel.keyId, key: channel.key };
+                    playerType = "dash";
+                } else {
+                    playerType = channel.manifestUri.endsWith('.mpd') ? 'dash' : 'hls';
+                }
+            } else if (channel.type === "dash") {
+                playerType = "dash";
+            } else if (channel.type === "hls") {
+                player: 'hls';
+            }
+
+            if (typeof jwplayer !== 'function') {
+                const videoContainer = document.getElementById('video');
+                if (videoContainer) {
+                    videoContainer.innerHTML = '<p style="color:white; text-align:center; padding-top:20px;">JW Player failed to load. Cannot play stream.</p>';
+                }
+                console.error("JW Player is not defined.");
+                return;
+            }
+            
+            if (jwplayer("video").getState() === 'idle') {
+                 jwplayer("video").setup({
+                     file: channel.manifestUri,
+                     type: playerType,
+                     drm: Object.keys(drmConfig).length ? drmConfig : undefined,
+                     autostart: true,
+                     width: "100%",
+                     aspectratio: "16:9",
+                     stretching: "exactfit",
+                 });
+            } else {
+                jwplayer("video").load([
+                    {
+                        file: channel.manifestUri,
+                        type: playerType,
+                        drm: Object.keys(drmConfig).length ? drmConfig : undefined,
+                    }
+                ]);
+                jwplayer("video").play(true);
+            }
+
+            jwplayer("video").on("error", (e) => console.error("JWPlayer Error:", (e && e.message) || e));
+        }
+
+        // --- SEARCH (RESTORED) ---
+        function setupSearch() {
+            const searchInput = document.getElementById("search");
+            const clearBtn = document.getElementById("clearSearch");
+
+            if (!searchInput || !clearBtn) return;
+
+            searchInput.value = "";
+            clearBtn.style.display = "none";
+
+            searchInput.addEventListener("input", () => {
+                const val = searchInput.value.trim();
+                clearBtn.style.display = val ? "block" : "none";
+                renderChannelButtons(val);
+                resetChannelListScroll();
+            });
+
+            clearBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                clearBtn.style.display = "none";
+                renderChannelButtons("");
+                resetChannelListScroll();
+            });
+        }
+
+        // --- CATEGORY TABS (RESTORED) ---
+        function setupCategoryTabs() {
+            renderCategories(); 
+            
+            const categoryButtons = document.querySelectorAll(".category-button");
+            categoryButtons.forEach((button, index) => {
+                button.addEventListener("click", () => {
+                    currentTabIndex = index;
+                    categoryButtons.forEach(btn => btn.classList.remove("active"));
+                    button.classList.add("active");
+                    renderChannelButtons(currentSearchFilter);
+                    resetChannelListScroll();
+                });
+            });
+        }
+
+        // --- UI RENDERING FUNCTIONS (RESTORED) ---
+        function renderCategories() {
+            const categoryBar = document.querySelector('.category-bar');
+            categoryBar.innerHTML = '';
+            tabs.forEach((cat, index) => {
+                const button = document.createElement('button');
+                button.className = `category-button ${index === currentTabIndex ? 'active' : ''}`;
+                button.setAttribute('data-category', cat);
+                // Correctly capitalize and replace for display
+                button.textContent = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/ & /g, ' & '); 
+                categoryBar.appendChild(button);
+            });
+        }
+        
+        // --- HAMBURGER MENU (RESTORED) ---
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('navPages');
+
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+            
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        // --- MODALS (RESTORED) ---
+        function setupModals() {
+            // Welcome Modal (removed countdown for simplicity in static mode)
+            const welcomeModal = document.getElementById('welcomeModal');
+            const closeWelcomeBtn = document.getElementById('closeModalBtn');
+            const closeWelcome = () => welcomeModal.classList.remove('active');
+
+            if(closeWelcomeBtn) closeWelcomeBtn.addEventListener('click', closeWelcome);
+            if(welcomeModal) welcomeModal.addEventListener('click', (e) => { if (e.target === welcomeModal) closeWelcome(); });
+            // Show welcome modal just once per session (re-added logic)
+            if (!sessionStorage.getItem('welcomeModalShown')) {
+                 if(welcomeModal) {
+                    welcomeModal.classList.add('active');
+                    sessionStorage.setItem('welcomeModalShown', 'true');
+                    setTimeout(closeWelcome, 5000); // Auto-close after 5s
+                 }
+            }
+
+
+            // QR Code Modal
+            const qrCodeImage = document.querySelector('.donation-qr-code');
+            const qrModal = document.getElementById('qrModal');
+            const zoomedQrImage = document.getElementById('zoomedQrImage');
+            const closeQrModalBtn = document.getElementById('closeQrModalBtn');
+
+            if (qrCodeImage) {
+                qrCodeImage.addEventListener('click', () => {
+                    if (zoomedQrImage && qrCodeImage) zoomedQrImage.src = qrCodeImage.src;
+                    if (qrModal) qrModal.classList.add('active');
+                });
+            }
+
+            const closeQrModal = () => {
+                if (qrModal) qrModal.classList.remove('active');
+            };
+            if(closeQrModalBtn) closeQrModalBtn.addEventListener('click', closeQrModal);
+            if(qrModal) qrModal.addEventListener('click', (e) => { if (e.target === qrModal) closeQrModal(); });
+        }
+
+
+        // --- BACK TO TOP BUTTON (RESTORED) ---
+        function setupBackToTopButton() {
+            const backToTopButton = document.getElementById('backToTopBtn');
+            const aboutSection = document.getElementById('about-us');
+            if (!backToTopButton || !aboutSection) return;
+
+            // This only shows the button, the scrolling is native HTML smooth scrolling
+            window.addEventListener('scroll', () => {
+                backToTopButton.classList.toggle('show', window.scrollY > aboutSection.offsetTop);
+            });
+
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // --- SCROLL REVEAL IMPLEMENTATION (FIXED PERSISTENCE) ---
+        function setupScrollReveal() {
+            const sections = document.querySelectorAll('.scroll-reveal');
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1 
+            };
+
+            const observerCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // IMPORTANT FIX: Once active, unobserve the element so the animation doesn't reset on scroll up
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+                // Manual check on load to instantly activate visible elements (like header content)
+                const rect = section.getBoundingClientRect();
+                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                if (rect.top <= viewportHeight * 0.5 && rect.bottom >= 0) { // Check if element is partially visible
+                    setTimeout(() => section.classList.add('active'), 10);
+                }
+            });
+        }
+        
+        // --- NOTIFICATION BANNER LOGIC (RESTORED) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const banner = document.getElementById('liveNotificationBanner');
+            const messageEl = document.getElementById('notificationMessage');
+            const closeBtn = document.getElementById('closeNotificationBtn');
+            const NOTIFICATION_URL = 'notification.json';
+            const SESSION_KEY = 'notificationClosed';
+            let currentNotificationId = null;
+
+            if (!banner || !messageEl || !closeBtn) return;
+
+            // --- Show/Hide Logic ---
+            function showBanner(message, type = 'alert', autoHide = true) {
+                messageEl.innerHTML = message;
+                banner.classList.remove('info', 'success', 'alert', 'hide');
+                banner.classList.add(type || 'alert');
+
+                banner.style.display = 'flex';
+                setTimeout(() => banner.classList.add('show'), 10);
+
+                if (autoHide) {
+                    setTimeout(() => hideBanner(), 8000);
+                }
+            }
+
+            function hideBanner() {
+                banner.classList.remove('show');
+                banner.classList.add('hide');
+                setTimeout(() => (banner.style.display = 'none'), 400);
+            }
+
+            // --- Close Button ---
+            closeBtn.addEventListener('click', () => {
+                hideBanner();
+                sessionStorage.setItem(SESSION_KEY, currentNotificationId || 'true');
+            });
+
+            // --- Fetch Notification ---
+            async function fetchNotification() {
+                try {
+                    // This will likely fail in a sandboxed environment, triggering the fallback
+                    const response = await fetch(`${NOTIFICATION_URL}?t=${Date.now()}`);
+                    if (!response.ok) throw new Error('Notification file not found.');
+                    
+                    const data = await response.json();
+                    const lastClosed = sessionStorage.getItem(SESSION_KEY);
+                    const shouldShow = data.show && (lastClosed !== data.id);
+
+                    currentNotificationId = data.id;
+
+                    if (shouldShow) showBanner(data.message, data.type);
+                    else hideBanner();
+                } catch (error) {
+                    // Default to showing the hardcoded message if fetch fails
+                    showBanner(messageEl.textContent, 'info', true);
+                }
+            }
+            
+            fetchNotification();
+            setInterval(fetchNotification, 60000); // Poll every 60s
+        });
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up channels and sorting
+            sortedChannels = Object.entries(channels).sort((a, b) => a[1].name.localeCompare(b[1].name));
+
+            // Load state
+            loadFavoritesFromStorage();
+
+            // Setup UI interactions
+            setupSearch();
+            setupCategoryTabs();
+            setupHamburgerMenu();
+            setupBackToTopButton();
+            setupModals(); // Combined welcome and QR modals
+            setupScrollReveal();
+
+            // Render initial channel list
+            renderChannelButtons();
+            resetChannelListScroll();
+
+            // Attach click handler to clearFavoritesBtn
+            const clearFavBtn = document.getElementById("clearFavoritesBtn");
+            if (clearFavBtn) {
+                clearFavBtn.addEventListener('click', clearAllFavorites);
+            }
+
+            // Set initial channel and start viewer count updates
+            const initialChannelKey = sortedChannels[0]?.[0] || Object.keys(channels)[0];
+            if (channels[initialChannelKey]) loadChannel(initialChannelKey);
+
+            updateViewerCount();
+            setInterval(updateViewerCount, 5000);
+        });
+    </script>
 </body>
 </html>
