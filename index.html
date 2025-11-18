@@ -420,20 +420,20 @@
 
         .contact-container {
             display: flex;
-            flex-wrap: nowrap; /* Adjusted for desktop view */
-            gap: 4rem; /* Adjusted for desktop view */
+            flex-wrap: nowrap;
+            gap: 4rem;
             justify-content: center;
-            align-items: stretch;
+            align-items: flex-start; /* FIX: Align items to the start for uniform top line */
         }
 
         .contact-social {
             flex: 1;
-            min-width: 400px; /* Adjusted for desktop view */
-            flex-shrink: 0; /* Adjusted for desktop view */
+            min-width: 400px;
+            flex-shrink: 0;
             text-align: center;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start; /* Align content to the top */
             align-items: center;
         }
 
@@ -449,8 +449,8 @@
         }
 
         .contact-social .contact-links {
-            margin-top: 0;
-            margin-bottom: 1rem;
+            margin-top: 10px; /* Added margin to separate from heading/text */
+            margin-bottom: 1.5rem; /* Increased vertical space */
         }
 
         /* --- SOCIAL LINKS COMPACT --- */
@@ -548,14 +548,16 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
+            /* visibility: hidden; REMOVED FOR STATIC HTML */
+            /* opacity: 0; REMOVED FOR STATIC HTML */
             transition: opacity 0.3s ease, visibility 0.3s ease;
+            display: none; /* Default hide for static HTML */
         }
 
         .modal-overlay.active {
             visibility: visible;
             opacity: 1;
+            display: flex;
         }
 
         .modal-content {
@@ -897,7 +899,7 @@
             width: 92%;
             padding: 12px 16px;
             border-radius: 12px;
-            display: flex;
+            display: none; /* Hiding since JS is removed */
             align-items: center;
             justify-content: space-between;
             font-weight: 600;
@@ -914,102 +916,21 @@
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
         }
 
-        /* Show / Hide Animation */
-        .notification-banner.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-            pointer-events: auto;
-        }
-
-        .notification-banner.hide {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-40px);
-            pointer-events: none;
-        }
-
-        /* --- Type Variants (Gradient restored for all devices) --- */
-        .notification-banner.info {
-            background-image: linear-gradient(90deg, #00bcd4 0%, #2196f3 100%);
-        }
-
-        .notification-banner.success {
-            background-image: linear-gradient(90deg, #43a047 0%, #2e7d32 100%);
-        }
-
-        .notification-banner.alert {
-            background-image: linear-gradient(90deg, #ff7043 0%, #e53935 100%);
-        }
-
-        /* --- Content --- */
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .notification-content i {
-            font-size: 1.1rem;
-        }
-
-        /* --- Close Button --- */
-        .close-notification-btn {
-            background: none;
-            border: none;
-            color: inherit;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-            flex-shrink: 0;
-        }
-
-        .close-notification-btn:hover {
-            transform: scale(1.2);
-        }
-
-        /* --- TV Remote Focus Glow (soft blue ring) --- */
-        .focused {
-            outline: 3px solid #00aaff;
-            box-shadow: 0 0 14px #00aaff;
-            border-radius: 8px;
-            transition: box-shadow 0.12s, outline 0.12s, transform 0.08s;
-            transform: translateZ(0);
-            z-index: 99999;
-        }
-
-        /* Slight focus scale so TV remote feels responsive */
-        .focused.scale {
-            transform: scale(1.02);
-        }
-
-        /* Make focusable elements visibly focusable for mouse users too */
-        button:focus, a:focus, input:focus, textarea:focus {
-            outline: none;
-        }
-
-        /* Ensure modal focus is obvious */
-        .modal-overlay .focused {
-            outline-color: #00aaff;
-            box-shadow: 0 0 18px #00aaff;
-        }
-        
         /* --- SCROLL REVEAL CSS ADDITIONS: Directional Fade-In --- */
         
-        /* Base hidden state and transition (APPLES TO ALL .scroll-reveal) */
+        /* Base state for animation start. IMPORTANT: Removing opacity/visibility override for static HTML */
         .scroll-reveal {
-            opacity: 0;
-            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* INCREASED TIME */
+            /* opacity: 0; /* REMOVED to make text visible in static HTML mode */
+            transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
             will-change: opacity, transform;
-            /* FIX: Ensure element is visually hidden until activated, fixing the visibility bug */
-            visibility: hidden; 
+            /* visibility: hidden; REMOVED to make text visible in static HTML mode */
         }
         
         /* 1. Pop-Up Animation (FOR MAIN SECTION HEADINGS - h2, and entire section wrapper) */
         .info-section > .container > .lg-heading.scroll-reveal,
         .contact-social > .lg-heading.scroll-reveal,
         .info-section.scroll-reveal {
-            transform: translateY(20px) scale(0.98); 
+            /* transform: translateY(20px) scale(0.98); REMOVED for visibility */
         }
 
         /* 2. Alternating Slide Animation (FOR ALL DIRECT CHILD ELEMENTS OF .container EXCEPT h2) */
@@ -1017,74 +938,60 @@
         .contact-social > .scroll-reveal:not(.lg-heading), /* Target p, h3, ul inside contact-social */
         .contact-form form > * /* Target direct children of the form */
         {
-            /* Default to sliding from left */
-            transform: translateX(-80px); /* INCREASED DISTANCE */
-            opacity: 0;
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* INCREASED TIME */
+            /* transform: translateX(-50px); REMOVED for visibility */
+            /* opacity: 0; REMOVED for visibility */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; 
         }
 
         /* Slide from Right (Even-numbered direct children of the container/form) */
-        /* This creates the alternating L-R-L-R effect */
         .info-section > .container > .scroll-reveal:not(.lg-heading):nth-child(even),
         .contact-form form > *:nth-child(even) {
-            transform: translateX(80px); /* INCREASED DISTANCE */
+            /* transform: translateX(50px); REMOVED for visibility */
         }
 
         /* Active State: Reset transform and opacity */
         .scroll-reveal.active {
             opacity: 1;
-            transform: translate(0, 0) scale(1); /* Reset transform (slide/pop-up) and scale */
-            /* FIX: Ensure element is visible after activation */
+            transform: translate(0, 0) scale(1);
             visibility: visible;
         }
-        
-        /* Staggered Delay for Sub-elements in About/Privacy sections */
-        .info-section.scroll-reveal.active > .container > *:nth-child(2) { transition-delay: 0.2s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(3) { transition-delay: 0.3s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(4) { transition-delay: 0.4s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(5) { transition-delay: 0.5s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(6) { transition-delay: 0.6s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(7) { transition-delay: 0.7s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(8) { transition-delay: 0.8s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(9) { transition-delay: 0.9s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(10) { transition-delay: 1.0s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(11) { transition-delay: 1.1s; }
-        .info-section.scroll-reveal.active > .container > *:nth-child(12) { transition-delay: 1.2s; }
-        
-        /* Custom staggering for contact form children (L, R, L, R...) */
-        .contact-form form > .scroll-reveal:nth-child(1) { transition-delay: 0.2s; } /* Label 1 (L) */
-        .contact-form form > .scroll-reveal:nth-child(2) { transition-delay: 0.3s; } /* Input 1 (R) */
-        .contact-form form > .scroll-reveal:nth-child(3) { transition-delay: 0.4s; } /* Label 2 (L) */
-        .contact-form form > .scroll-reveal:nth-child(4) { transition-delay: 0.5s; } /* Input 2 (R) */
-        .contact-form form > .scroll-reveal:nth-child(5) { transition-delay: 0.6s; } /* Label 3 (L) */
-        .contact-form form > .scroll-reveal:nth-child(6) { transition-delay: 0.7s; } /* Input 3 (R) */
-        .contact-form form > .scroll-reveal:nth-child(7) { transition-delay: 0.8s; } /* Button (L) */
 
-
-        /* Staggered updates section (Kept the original, separate stagger for complexity) */
-        .updates-scroll-container .update-item {
-              opacity: 0;
-              transform: translateY(20px);
-              transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        /* --- RESTORED VISIBILITY FOR STATIC HTML --- */
+        /* Since JS is gone, we must manually ensure all text starts visible, which means removing the initial hidden state */
+        .scroll-reveal,
+        .info-section > .container > .scroll-reveal:not(.lg-heading), 
+        .contact-social > .scroll-reveal:not(.lg-heading),
+        .contact-form form > * {
+            opacity: 1;
+            visibility: visible;
+            transform: none;
         }
 
-        .info-section.scroll-reveal.active .update-item {
-              opacity: 1;
-              transform: translateY(0);
+        /* --- Mobile Responsive Overrides --- */
+        @media (max-width: 768px) {
+            .contact-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .contact-social {
+                min-width: unset;
+                width: 100%;
+                /* Align items centered on mobile for consistency */
+                align-items: center;
+                justify-content: center;
+            }
+            .contact-form {
+                min-width: unset;
+                width: 100%;
+            }
+            /* Override desktop non-wrap alignment */
+            .contact-container {
+                flex-wrap: wrap; 
+                gap: 20px; 
+                align-items: center;
+            }
         }
-        
-        /* Apply a slight stagger to the update items based on their position */
-        .info-section.scroll-reveal.active .update-item:nth-child(1) { transition-delay: 0.2s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(2) { transition-delay: 0.3s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(3) { transition-delay: 0.4s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(4) { transition-delay: 0.5s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(5) { transition-delay: 0.6s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(6) { transition-delay: 0.7s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(7) { transition-delay: 0.8s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(8) { transition-delay: 0.9s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(9) { transition-delay: 1.0s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(10) { transition-delay: 1.1s; }
-        .info-section.scroll-reveal.active .update-item:nth-child(11) { transition-delay: 1.2s; }
     </style>
     </head>
 <body>
@@ -1096,10 +1003,10 @@
                     <span class="logo-text">Shakzz TV</span>
                 </div>
                 <div class="nav-pages">
-                    <a href="#about-us" class="focusable-element" tabindex="0">About</a>
-                    <a href="#updates" class="focusable-element" tabindex="0">Updates</a>
-                    <a href="#privacy-policy" class="focusable-element" tabindex="0">Privacy</a>
-                    <a href="#contact" class="focusable-element" tabindex="0">Contact</a>
+                    <a href="#about-us">About</a>
+                    <a href="#updates">Updates</a>
+                    <a href="#privacy-policy">Privacy</a>
+                    <a href="#contact">Contact</a>
                 </div>
             </div>
             <div class="nav-links">
@@ -1107,8 +1014,8 @@
                     <i class="fas fa-eye"></i>
                     <span id="viewerCountText">0</span>
                 </div>
-                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="click-here-link focusable-element" tabindex="0">CLICK HERE</a>
-                <div class="hamburger focusable-element" id="hamburger" tabindex="0">
+                <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="click-here-link">CLICK HERE</a>
+                <div class="hamburger" id="hamburger">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -1116,27 +1023,28 @@
             </div>
         </nav>
         <div class="mobile-nav-pages" id="navPages">
-            <a href="#about-us" class="focusable-element" tabindex="0">About</a>
-            <a href="#updates" class="focusable-element" tabindex="0">Updates</a>
-            <a href="#privacy-policy" class="focusable-element" tabindex="0">Privacy</a>
-            <a href="#contact" class="focusable-element" tabindex="0">Contact</a>
-            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="click-here-link focusable-element" tabindex="0">CLICK HERE</a>
+            <a href="#about-us">About</a>
+            <a href="#updates">Updates</a>
+            <a href="#privacy-policy">Privacy</a>
+            <a href="#contact">Contact</a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="click-here-link">CLICK HERE</a>
         </div>
     </header>
 
-    <div id="liveNotificationBanner" class="notification-banner info hide">
+    <div id="liveNotificationBanner" class="modal-overlay info">
+        <!-- Kept modal-overlay class for styling consistency, but display:none in CSS -->
         <div class="notification-content">
             <i class="fas fa-broadcast-tower"></i>
             <span id="notificationMessage">🎥 LIVE: We've just added 5 new channels to the 'Movies' category!</span>
         </div>
-        <button id="closeNotificationBtn" class="close-notification-btn focusable-element" tabindex="0">&times;</button>
+        <button id="closeNotificationBtn" class="close-notification-btn">&times;</button>
     </div>
 
     <section id="main-content-area">
         <div class="main-player-section">
             <div id="playerWrapper" style="position: relative;">
-                <!-- The JW Player container is now focusable for TV Remote mode -->
-                <div id="video" class="focusable-element" tabindex="0"></div> 
+                <!-- The JW Player container -->
+                <div id="video"></div> 
                 <div id="overlayContainer" style="
                     position: absolute;
                     top: 10px;
@@ -1165,14 +1073,23 @@
 
         <div class="sidebar">
             <div class="search-container">
-                <input type="text" id="search" placeholder="Search channel..." class="focusable-element" tabindex="0">
-                <span id="clearSearch" class="clear-btn focusable-element" tabindex="0">×</span>
+                <input type="text" id="search" placeholder="Search channel...">
+                <span id="clearSearch" class="clear-btn">×</span>
             </div>
 
             <div class="category-bar">
+                <!-- Static Category Buttons (1st button active) -->
+                <button class="category-button active" data-category="all">All</button>
+                <button class="category-button" data-category="favorites">Favorites</button>
+                <button class="category-button" data-category="news">News</button>
+                <button class="category-button" data-category="entertainment">Entertainment</button>
+                <button class="category-button" data-category="movies">Movies</button>
+                <button class="category-button" data-category="sports">Sports</button>
+                <button class="category-button" data-category="documentary">Documentary</button>
+                <button class="category-button" data-category="cartoons & animations">Cartoons & Animations</button>
             </div>
 
-            <button id="clearFavoritesBtn" class="clear-fav-btn focusable-element" style="display:none;" tabindex="0">
+            <button id="clearFavoritesBtn" class="clear-fav-btn" style="display:none;">
                 <i class="fas fa-trash"></i> Clear Favorites
             </button>
 
@@ -1183,6 +1100,27 @@
 
             <div class="scrollable-list">
                 <div class="channel-list" id="channelList">
+                    <!-- Placeholder Channel Buttons -->
+                    <button class="channel-button" data-key="PBBMain">
+                        <img src="https://placehold.co/30x30/0000FF/FFFFFF?text=L1" alt="Channel Logo" class="channel-logo">
+                        <span class="channel-name">PBB Main</span>
+                        <span class="favorite-star">☆</span>
+                    </button>
+                    <button class="channel-button" data-key="discoveryscience">
+                        <img src="https://placehold.co/30x30/FF0000/FFFFFF?text=L2" alt="Channel Logo" class="channel-logo">
+                        <span class="channel-name">Discovery Science</span>
+                        <span class="favorite-star active">⭐</span>
+                    </button>
+                    <button class="channel-button" data-key="KidoodleTV">
+                        <img src="https://placehold.co/30x30/00FF00/FFFFFF?text=L3" alt="Channel Logo" class="channel-logo">
+                        <span class="channel-name">Kidoodle TV</span>
+                        <span class="favorite-star">☆</span>
+                    </button>
+                    <button class="channel-button" data-key="jeepneytv">
+                        <img src="https://placehold.co/30x30/FFFF00/000000?text=L4" alt="Channel Logo" class="channel-logo">
+                        <span class="channel-name">Jeepney TV</span>
+                        <span class="favorite-star">☆</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1191,6 +1129,7 @@
     <section id="about-us" class="info-section scroll-reveal">
         <div class="container">
             <h2 class="lg-heading scroll-reveal">About Shakzz TV</h2>
+            <!-- These elements are now visible due to CSS fix -->
             <p class="scroll-reveal">Shakzz TV delivers a premier, curated portfolio of local and international networks, providing a seamless, high-quality streaming experience available 24/7. Our platform offers a comprehensive spectrum of programming designed to cater to every interest—from breaking news and live sports to insightful documentaries and engaging animation.</p>
             
             <h3 class="scroll-reveal">Our Vision & Commitment</h3>
@@ -1262,6 +1201,7 @@
     <section id="privacy-policy" class="info-section scroll-reveal">
         <div class="container">
             <h2 class="lg-heading scroll-reveal">Privacy Policy</h2>
+            <!-- These elements are now visible due to CSS fix -->
             <p class="scroll-reveal">At Shakzz TV, your privacy is paramount. This policy outlines how we collect, use, and protect your information. By using our service, you agree to the collection and use of information in accordance with this policy.</p>
             
             <h3 class="scroll-reveal">Information We Collect</h3>
@@ -1293,16 +1233,16 @@
                 <h2 class="lg-heading scroll-reveal">Get in Touch</h2>
                 <p class="scroll-reveal">Connect with us on social media:</p>
                 <div class="contact-links scroll-reveal">
-                    <a href="https://facebook.com/profile.php?id=100083316728361" target="_blank" class="social-link neon-bubble focusable-element" tabindex="0">
+                    <a href="https://facebook.com/profile.php?id=100083316728361" target="_blank" class="social-link neon-bubble">
                         <i class="fab fa-facebook"></i>
                     </a>
-                    <a href="https://youtube.com/@Shakzz05" target="_blank" class="social-link neon-bubble focusable-element" tabindex="0">
+                    <a href="https://youtube.com/@Shakzz05" target="_blank" class="social-link neon-bubble">
                         <i class="fab fa-youtube"></i>
                     </a>
                 </div>
                 <div class="donation-info">
                     <p class="donation-text scroll-reveal">Your support helps keep this site running. Scan to donate via Gcash, Maya, or BPI. Need help scanning? Search for a QR tutorial on YouTube.</p>
-                    <img src="https://placehold.co/200x200/FFFFFF/000000?text=SCAN+TO+DONATE" alt="BPI QR Code for Donations" class="donation-qr-code scroll-reveal focusable-element" id="qrImage" tabindex="0">
+                    <img src="https://placehold.co/200x200/FFFFFF/000000?text=SCAN+TO+DONATE" alt="BPI QR Code for Donations" class="donation-qr-code scroll-reveal" id="qrImage">
                     <p class="qr-zoom-text scroll-reveal">Click picture to zoom</p>
                 </div>
             </div>
@@ -1310,25 +1250,26 @@
             <div class="contact-form">
                 <form id="contactForm" action="https://formspree.io/f/manpwdko" method="POST">
                     <label for="name" class="scroll-reveal">Title / Name:</label>
-                    <input type="text" id="name" name="name" placeholder="Your name or title" required class="focusable-element scroll-reveal" tabindex="0">
+                    <input type="text" id="name" name="name" placeholder="Your name or title" required class="scroll-reveal">
                     
                     <label for="email" class="scroll-reveal">Email Address:</label>
-                    <input type="email" id="email" name="email" placeholder="Your email" required class="focusable-element scroll-reveal" tabindex="0">
+                    <input type="email" id="email" name="email" placeholder="Your email" required class="scroll-reveal">
                     
                     <label for="message" class="scroll-reveal">Description / Message:</label>
-                    <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required class="focusable-element scroll-reveal" tabindex="0"></textarea>
+                    <textarea id="message" name="message" rows="5" placeholder="Write your message here..." required class="scroll-reveal"></textarea>
                     
-                    <button type="submit" class="focusable-element scroll-reveal" tabindex="0">Send</button>
+                    <button type="submit" class="scroll-reveal">Send</button>
                 </form>
             </div>
         </div>
         <p class="copyright-text">© 2025 Shakzz TV. All rights reserved. User ID: <span id="displayUserId">...</span></p>
     </section>
 
+    <!-- Modals are present but hidden by default in CSS without JS -->
     <div id="welcomeModal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-countdown" id="modalCountdown">5</span>
-            <span class="close-button focusable-element" id="closeModalBtn" tabindex="0">×</span>
+            <span class="close-button" id="closeModalBtn">×</span>
             <h2 class="modal-heading">Welcome to Shakzz TV!</h2>
             <p class="modal-text">Enjoy a curated selection of local and international channels, available 24/7.</p>
         </div>
@@ -1336,823 +1277,13 @@
 
     <div id="qrModal" class="modal-overlay">
         <div class="modal-content qr-modal-content">
-            <span class="close-button focusable-element" id="closeQrModalBtn" tabindex="0">×</span>
+            <span class="close-button" id="closeQrModalBtn">×</span>
             <img src="https://placehold.co/500x500/FFFFFF/000000?text=SCAN+TO+DONATE" alt="Zoomed QR Code" id="zoomedQrImage">
         </div>
     </div>
 
-    <button id="backToTopBtn" title="Go to top" class="focusable-element" tabindex="0"><i class="fas fa-arrow-up"></i></button>
+    <!-- Back to top button is present but hidden by default in CSS without JS -->
+    <button id="backToTopBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
 
-    <script type="module">
-        // This script block now contains the full application logic.
-        
-        const channels = {
-            PBBMain: {
-                name: "PBB Main",
-                type: "clearkey",
-                manifestUri: "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-pbb-live-dash-abscbnono/index.mpd",
-                logo: "https://i.imgur.com/n5rdR3v.png",
-                group: ["entertainment"],
-            },
-
-            PBBDiningArea: {
-                name: "PBB Dining Area",
-                type: "clearkey",
-                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/pbb1/manifest.mpd",
-                logo: "https://i.imgur.com/n5rdR3v.png",
-                keyId: "b37bb823fe48452eba8cee62516f5da1",
-                key: "8b48cec6bce94917e4c39c381d607102",
-                group: ["entertainment"],
-            },
-
-            PBBPoolArea: {
-                name: "PBB Pool Area",
-                type: "clearkey",
-                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/pbb2/manifest.mpd",
-                logo: "https://i.imgur.com/n5rdR3v.png",
-                keyId: "9539027a7c42446a8648555af3bb3095",
-                key: "1cb94c88f68bef1e728cfa4677e1eeca",
-                group: ["entertainment"],
-            },
-
-            discoveryscience: {
-                name: "Discovery Science",
-                type: "clearkey",
-                manifestUri: "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/Discoveryscience2/default/manifest.mpd",
-                keyId: "5458f45efedb4d6f8aa6ac76c85b621b",
-                key: "dbf8a0a306a64525ba3012fd225370c0",
-                logo: " https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkA_8vr9UZUhtkaFi6AshM83zQwhPWBGWX-Q&s",
-                group: ["documentary"],
-            },
-            KidoodleTV: {
-                name: "Kidoodle TV",
-                type: "hls",
-                manifestUri: "https://amg07653-apmc-amg07653c5-samsung-ph-8539.playouts.now.amagi.tv/playlist.m3u8",
-                logo: "https://d1iiooxwdowqwr.cloudfront.net/pub/appsubmissions/20201230211817_FullLogoColor4x.png",
-                group: ["cartoons & animations"],
-            },
-            StrawberryShortcake: {
-                name: "Strawberry Shortcake",
-                type: "hls",
-                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258006/hls/master.m3u8?ads.xumo_channelId=88258006",
-                logo: "https://upload.wikimedia.org/wikipedia/en/f/ff/Strawberry_Shortcake_2003_Logo.png",
-                group: ["cartoons & animations"],
-            },
-            SonictheHedgehog: {
-                name: "Sonic the Hedgehog",
-                type: "hls",
-                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258004/hls/master.m3u8?ads.xumo_channelId=88258004",
-                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Sonic_The_Hedgehog.svg/1200px-Sonic_The_Hedgehog.svg.png",
-                group: ["cartoons & animations"],
-            },
-            SuperMario: {
-                name: "Super Mario",
-                type: "hls",
-                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258005/hls/master.m3u8?ads.xumo_channelId=88258005",
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFkMkkUmZBGslGWGZMN2er5emlnqGCCU49wg&s",
-                group: ["cartoons & animations"],
-            },
-            Teletubbies: {
-                name: "Teletubbies",
-                type: "hls",
-                manifestUri: "https://d1si3n1st4nkgb.cloudfront.net/10000/88258003/hls/master.m3u8?ads.xumo_channelId=88258003",
-                logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Teletubbies_Logo.png/330px-Teletubbies_Logo.png",
-                group: ["cartoons & animations"],
-            },
-            anione: {
-                name: "Ani One",
-                type: "hls",
-                manifestUri: "https://amg19223-amg19223c9-amgplt0019.playout.now3.amagi.tv/playlist/amg19223-amg19223c9-amgplt0019/playlist.m3u8",
-                logo: "https://www.medialink.com.hk/img/ani-one-logo.jpg",
-                group: ["cartoons & animations"],
-            },
-            
-            jeepneytv: {
-                name: "Jeepney TV",
-                type: "clearkey",
-                manifestUri: "https://abslive.akamaized.net/dash/live/2028025/jeepneytv/manifest.mpd",
-                keyId: "90ea4079e02f418db7b170e8763e65f0",
-                key: "1bfe2d166e31d03eee86ee568bd6c272",
-                logo: "https://upload.wikimedia.org/wikipedia/en/1/15/Jeepney_TV_Logo_2015.svg",
-                group:["entertainment"],
-            },
-            
-            aniplus: {
-                name: "Aniplus",
-                type: "hls",
-                manifestUri: "https://amg18481-amg18481c1-amgplt0352.playout.now3.amagi.tv/playlist/amg18481-amg18481c1-amgplt0352/playlist.m3u8",
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJj494OpI0bKrTrvcHqEkzMYzqtfLNdWjQrg&s",
-                group: ["cartoons & animations"],
-            },
-            
-            sinemanila: {
-                name: "SineManila",
-                type: "hls",
-                manifestUri: "https://live20.bozztv.com/giatv/giatv-sinemanila/sinemanila/chunks.m3u8",
-                logo: "https://raw.githubusercontent.com/Shakzz890/LoidForger/main/SineManila.png",
-                group:["movies", "entertainment"],
-            },
-        };
-
-        // --- NEW: Force scroll top ---
-        window.onbeforeunload = () => window.scrollTo(0, 0);
-
-        // --- GLOBAL VARIABLES ---
-        let shownCount = 0;
-        let currentSearchFilter = "";
-        let currentChannelKey = Object.keys(channels)[0];
-        const tabs = ["all", "favorites", "news", "entertainment", "movies", "sports", "documentary", "cartoons & animations"];
-        let currentTabIndex = 0;
-        let sortedChannels = [];
-        
-        // TV REMOTE NAVIGATION VARIABLES
-        let focusIndex = -1;
-        let focusableElements = [];
-        let isTvRemoteMode = false;
-
-        // Setting a mock user ID
-        const displayUserId = document.getElementById('displayUserId');
-        if (displayUserId) {
-            displayUserId.textContent = 'MOCK_USER_ID_123456';
-        }
-
-
-        // --- HELPER FUNCTIONS ---
-        function resetChannelListScroll() {
-            const scrollableListContainer = document.querySelector(".scrollable-list");
-            if (scrollableListContainer) scrollableListContainer.scrollTop = 0;
-        }
-
-        function getOrCreateDeviceId() {
-            let deviceId = localStorage.getItem('deviceId');
-            if (!deviceId) {
-                deviceId = window.crypto?.randomUUID?.() || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-                    const r = Math.random() * 16 | 0;
-                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-                });
-                localStorage.setItem('deviceId', deviceId);
-            }
-            return deviceId;
-        }
-
-        // --- VIEWER COUNT ---
-        async function updateViewerCount() {
-            try {
-                const deviceId = getOrCreateDeviceId();
-                // This API endpoint is a mock and will likely fail, triggering the mock fallback
-                const res = await fetch(`/api/viewers?deviceId=${deviceId}`);
-                const data = await res.json();
-                const viewerCountEl = document.getElementById('viewerCountText');
-                if (viewerCountEl) viewerCountEl.innerText = data.count || 0;
-            } catch (e) {
-                // Mock fallback if API fails
-                const viewerCountEl = document.getElementById('viewerCountText');
-                if (viewerCountEl && viewerCountEl.innerText === '0') viewerCountEl.innerText = '99+'; 
-            }
-        }
-
-        // --- FAVORITES STORAGE HANDLER ---
-        function loadFavoritesFromStorage() {
-            const stored = JSON.parse(localStorage.getItem("favoriteChannels") || "[]");
-            Object.entries(channels).forEach(([key, channel]) => {
-                channel.favorite = stored.includes(key);
-            });
-        }
-
-        function saveFavoritesToStorage() {
-            const favorites = Object.entries(channels)
-                .filter(([key, ch]) => ch.favorite)
-                .map(([key]) => key);
-            localStorage.setItem("favoriteChannels", JSON.stringify(favorites));
-        }
-
-        // --- CLEAR ALL FAVORITES ---
-        function clearAllFavorites() {
-            Object.values(channels).forEach(ch => ch.favorite = false);
-            localStorage.removeItem("favoriteChannels");
-            renderChannelButtons(currentSearchFilter);
-            console.log("All favorites cleared. ⭐"); 
-        }
-
-        // --- CHANNEL RENDERING ---
-        function renderChannelButtons(filter = "") {
-            currentSearchFilter = filter;
-            const list = document.getElementById("channelList");
-            if (!list) return;
-            list.innerHTML = "";
-            shownCount = 0;
-
-            const selectedGroup = tabs[currentTabIndex];
-            const fragment = document.createDocumentFragment();
-
-            sortedChannels.forEach(([key, channel]) => {
-                const group = channel.group || "live";
-                const matchesSearch = channel.name.toLowerCase().includes(filter.toLowerCase());
-                const matchesFavorites = (selectedGroup === "favorites") ? channel.favorite === true : true;
-                const matchesGroup =
-                    selectedGroup === "all" ||
-                    selectedGroup === "favorites" ||
-                    (Array.isArray(group) ? group.includes(selectedGroup) : group === selectedGroup);
-
-                if (!matchesSearch || !matchesGroup || !matchesFavorites) return;
-
-                const btn = document.createElement("button");
-                btn.className = "channel-button focusable-element"; 
-                btn.setAttribute("data-key", key);
-                btn.setAttribute("tabindex", "0"); 
-
-                const logo = document.createElement("img");
-                logo.src = channel.logo;
-                logo.alt = channel.name;
-                logo.className = "channel-logo";
-
-                const nameSpan = document.createElement("span");
-                nameSpan.className = "channel-name";
-                nameSpan.textContent = channel.name;
-
-                // --- FAVORITE STAR ---
-                const favStar = document.createElement("span");
-                favStar.className = `favorite-star ${channel.favorite ? 'active' : ''}`;
-                favStar.innerHTML = channel.favorite ? "⭐" : "☆";
-                favStar.onclick = (e) => {
-                    e.stopPropagation();
-                    channel.favorite = !channel.favorite;
-                    favStar.innerHTML = channel.favorite ? "⭐" : "☆";
-                    saveFavoritesToStorage();
-                    if (selectedGroup === 'favorites') {
-                        renderChannelButtons(currentSearchFilter);
-                        // Re-evaluate focusable elements in case clicking changed the list
-                        focusableElements = getVisibleFocusableElements(); 
-                    } else {
-                        favStar.classList.toggle('active', channel.favorite);
-                    }
-                };
-
-                btn.appendChild(logo);
-                btn.appendChild(nameSpan);
-                btn.appendChild(favStar);
-                btn.onclick = () => loadChannel(key);
-
-                fragment.appendChild(btn);
-                shownCount++;
-            });
-
-            list.appendChild(fragment);
-
-            const countDisplay = document.getElementById("channelCountText");
-            const channelCountContainer = document.getElementById("channelCount");
-            if (countDisplay && channelCountContainer) {
-                countDisplay.textContent = `${shownCount} channel${shownCount !== 1 ? "s" : ""} found`;
-                if (shownCount > 0) channelCountContainer.classList.add("rainbow-text");
-                else channelCountContainer.classList.remove("rainbow-text");
-            }
-
-            const clearBtnEls = document.querySelectorAll('#clearFavoritesBtn'); 
-            clearBtnEls.forEach(btn => {
-                if (!btn) return;
-                btn.style.display = (selectedGroup === "favorites" && shownCount > 0) ? "block" : "none";
-            });
-        }
-
-        // --- LOAD CHANNEL ---
-        function loadChannel(key) {
-            const channel = channels[key];
-            if (!channel) return console.error(`Channel "${key}" not found`);
-
-            currentChannelKey = key;
-            renderChannelButtons(currentSearchFilter);
-
-            const nowPlayingEl = document.getElementById("nowPlayingChannel");
-            if (nowPlayingEl) {
-                nowPlayingEl.textContent = channel.name;
-
-                const overlay = document.getElementById("nowPlayingOverlay");
-                if (overlay) {
-                    overlay.classList.add("now-playing-animate");
-                    setTimeout(() => overlay.classList.remove("now-playing-animate"), 350);
-                }
-            }
-
-            const drmConfig = {};
-            let playerType = "hls";
-
-            if (channel.type === "widevine") {
-                drmConfig.widevine = { url: channel.licenseServerUri };
-                playerType = "dash";
-            } else if (channel.type === "clearkey") {
-                if (channel.keyId && channel.key) {
-                    drmConfig.clearkey = { keyId: channel.keyId, key: channel.key };
-                    playerType = "dash";
-                } else {
-                    playerType = channel.manifestUri.endsWith('.mpd') ? 'dash' : 'hls';
-                }
-            } else if (channel.type === "dash") {
-                playerType = "dash";
-            } else if (channel.type === "hls") {
-                player: 'hls';
-            }
-
-            if (typeof jwplayer !== 'function') {
-                const videoContainer = document.getElementById('video');
-                if (videoContainer) {
-                    videoContainer.innerHTML = '<p style="color:white; text-align:center; padding-top:20px;">JW Player failed to load. Cannot play stream.</p>';
-                }
-                console.error("JW Player is not defined.");
-                return;
-            }
-            
-            if (jwplayer("video").getState() === 'idle') {
-                 jwplayer("video").setup({
-                     file: channel.manifestUri,
-                     type: playerType,
-                     drm: Object.keys(drmConfig).length ? drmConfig : undefined,
-                     autostart: true,
-                     width: "100%",
-                     aspectratio: "16:9",
-                     stretching: "exactfit",
-                 });
-            } else {
-                jwplayer("video").load([
-                    {
-                        file: channel.manifestUri,
-                        type: playerType,
-                        drm: Object.keys(drmConfig).length ? drmConfig : undefined,
-                    }
-                ]);
-                jwplayer("video").play(true);
-            }
-
-            jwplayer("video").on("error", (e) => console.error("JWPlayer Error:", (e && e.message) || e));
-        }
-
-        // --- SEARCH ---
-        function setupSearch() {
-            const searchInput = document.getElementById("search");
-            const clearBtn = document.getElementById("clearSearch");
-
-            if (!searchInput || !clearBtn) return;
-
-            searchInput.value = "";
-            clearBtn.style.display = "none";
-
-            searchInput.addEventListener("input", () => {
-                const val = searchInput.value.trim();
-                clearBtn.style.display = val ? "block" : "none";
-                renderChannelButtons(val);
-                resetChannelListScroll();
-                // Update focusable elements list for TV mode
-                focusableElements = getVisibleFocusableElements(); 
-            });
-
-            clearBtn.addEventListener("click", () => {
-                searchInput.value = "";
-                clearBtn.style.display = "none";
-                renderChannelButtons("");
-                resetChannelListScroll();
-                // Update focusable elements list for TV mode
-                focusableElements = getVisibleFocusableElements(); 
-            });
-        }
-
-        // --- CATEGORY TABS ---
-        function setupCategoryTabs() {
-            renderCategories(); 
-            
-            const categoryButtons = document.querySelectorAll(".category-button");
-            categoryButtons.forEach((button, index) => {
-                button.addEventListener("click", () => {
-                    currentTabIndex = index;
-                    categoryButtons.forEach(btn => btn.classList.remove("active"));
-                    button.classList.add("active");
-                    renderChannelButtons(currentSearchFilter);
-                    resetChannelListScroll();
-                    // Update focusable elements list for TV mode
-                    focusableElements = getVisibleFocusableElements();
-                });
-            });
-        }
-
-        // --- HAMBURGER MENU ---
-        function setupHamburgerMenu() {
-            const hamburger = document.getElementById('hamburger');
-            const mobileMenu = document.getElementById('navPages');
-
-            if (!hamburger || !mobileMenu) return;
-
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-            
-            // Close menu when a link is clicked
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                    // Update focusable elements list for TV mode
-                    focusableElements = getVisibleFocusableElements(); 
-                });
-            });
-        }
-
-        // --- WELCOME MODAL ---
-        function setupWelcomeModal() {
-            if (sessionStorage.getItem('welcomeModalShown')) return;
-
-            const modal = document.getElementById('welcomeModal');
-            const closeBtn = document.getElementById('closeModalBtn');
-            const countdownSpan = document.getElementById('modalCountdown');
-
-            if (!modal || !closeBtn || !countdownSpan) return;
-
-            let countdown = 5;
-            let countdownInterval;
-
-            const closeModal = () => {
-                modal.classList.remove('active');
-                clearInterval(countdownInterval);
-                sessionStorage.setItem('welcomeModalShown', 'true');
-                // Re-evaluate focusable elements in case focus was inside the modal
-                focusableElements = getVisibleFocusableElements(); 
-            };
-
-            const startCountdown = () => {
-                countdownSpan.textContent = countdown;
-                countdownInterval = setInterval(() => {
-                    countdown--;
-                    countdownSpan.textContent = countdown;
-                    if (countdown <= 0) closeModal();
-                }, 1000);
-            };
-
-            closeBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-            document.querySelectorAll("nav a, .mobile-nav-pages a").forEach(link => {
-                link.addEventListener("click", () => { if (modal.classList.contains('active')) closeModal(); });
-            });
-
-            modal.classList.add('active');
-            startCountdown();
-        }
-
-        // --- QR CODE MODAL ---
-        function setupQrCodeModal() {
-            const qrCodeImage = document.querySelector('.donation-qr-code');
-            const qrModal = document.getElementById('qrModal');
-            const zoomedQrImage = document.getElementById('zoomedQrImage');
-            const closeQrModalBtn = document.getElementById('closeQrModalBtn');
-
-            if (!qrCodeImage || !qrModal || !zoomedQrImage || !closeQrModalBtn) return;
-
-            qrCodeImage.addEventListener('click', () => {
-                zoomedQrImage.src = qrCodeImage.src;
-                qrModal.classList.add('active');
-                // Re-evaluate focusable elements
-                focusableElements = getVisibleFocusableElements(); 
-            });
-
-            const closeModal = () => {
-                qrModal.classList.remove('active');
-                // Re-evaluate focusable elements
-                focusableElements = getVisibleFocusableElements();
-            };
-            closeQrModalBtn.addEventListener('click', closeModal);
-            qrModal.addEventListener('click', (e) => { if (e.target === qrModal) closeModal(); });
-        }
-
-        // --- BACK TO TOP BUTTON ---
-        function setupBackToTopButton() {
-            const backToTopButton = document.getElementById('backToTopBtn');
-            const aboutSection = document.getElementById('about-us');
-            if (!backToTopButton || !aboutSection) return;
-
-            window.addEventListener('scroll', () => {
-                backToTopButton.classList.toggle('show', window.scrollY > aboutSection.offsetTop);
-            });
-
-            backToTopButton.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-        
-        // --- UI RENDERING FUNCTIONS ---
-        function renderCategories() {
-            const categories = tabs; // Use global tabs array
-            const categoryBar = document.querySelector('.category-bar');
-            categoryBar.innerHTML = '';
-            categories.forEach((cat, index) => {
-                const button = document.createElement('button');
-                button.className = `category-button focusable-element ${index === currentTabIndex ? 'active' : ''}`;
-                button.setAttribute('data-category', cat);
-                button.setAttribute('tabindex', '0');
-                button.textContent = cat.charAt(0).toUpperCase() + cat.slice(1).replace(/ & /g, ' & ');
-                categoryBar.appendChild(button);
-            });
-        }
-        
-        // --- SCROLL REVEAL IMPLEMENTATION ---
-        function setupScrollReveal() {
-            const sections = document.querySelectorAll('.scroll-reveal');
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1 
-            };
-
-            const observerCallback = (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    } else {
-                        // Keep visible elements active even if they start scrolling out of the viewport
-                        // This prevents elements from disappearing while reading.
-                        // We only remove 'active' if it's completely out of the viewport (optional, removed for better UX)
-                        // For a staggered animation to fire correctly, we usually only observe for 'intersecting'.
-                    }
-                });
-            };
-
-            const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-            sections.forEach(section => {
-                observer.observe(section);
-
-                // FIX: Manual check on load for elements that should already be visible
-                const rect = section.getBoundingClientRect();
-                const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-
-                // If the element's top is visible or just slightly above the viewport (0 to 100px above for buffer)
-                if (rect.top <= viewportHeight && rect.bottom >= 0) {
-                     // Adding a slight delay (0ms) forces the browser to apply initial CSS before activation.
-                    setTimeout(() => section.classList.add('active'), 0);
-                }
-            });
-        }
-
-        // --- TV REMOTE NAVIGATION CORE LOGIC (New Feature Implementation) ---
-        function getVisibleFocusableElements() {
-            // Collect all elements intended for navigation
-            const selectors = '.focusable-element:not([style*="display: none"]):not([aria-hidden="true"]):not([disabled])';
-            const elements = Array.from(document.querySelectorAll(selectors));
-
-            // Filter for visibility and exclude elements in closed menus/modals
-            return elements.filter(el => {
-                // Check if element or its ancestor is in a hidden modal/menu, but allow if modal is active
-                const isHiddenParent = el.closest('.modal-overlay:not(.active), .mobile-nav-pages:not(.active), #clearFavoritesBtn:not([style*="block"])');
-                
-                // Exclude elements that are visually hidden 
-                const style = window.getComputedStyle(el);
-                const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-
-                return !isHiddenParent && isVisible;
-            });
-        }
-
-        function updateFocus(newIndex) {
-            if (focusIndex > -1 && focusableElements[focusIndex]) {
-                focusableElements[focusIndex].classList.remove('focused', 'scale');
-            }
-
-            if (newIndex >= 0 && newIndex < focusableElements.length) {
-                focusIndex = newIndex;
-                const newFocus = focusableElements[focusIndex];
-                newFocus.classList.add('focused', 'scale');
-                newFocus.focus({ preventScroll: true }); 
-                
-                // Scroll the parent container to bring the focused element into view
-                const parentScroll = newFocus.closest('.scrollable-list');
-                if (parentScroll) {
-                    const rect = newFocus.getBoundingClientRect();
-                    const parentRect = parentScroll.getBoundingClientRect();
-
-                    if (rect.top < parentRect.top) {
-                        parentScroll.scrollTop -= (parentRect.top - rect.top) + 10;
-                    } else if (rect.bottom > parentRect.bottom) {
-                        parentScroll.scrollTop += (rect.bottom - parentRect.bottom) + 10;
-                    }
-                }
-            } else {
-                focusIndex = -1;
-            }
-        }
-
-        function handleTvRemoteNavigation(event) {
-            const key = event.key;
-            
-            // Check current modal/menu state
-            const isMobileMenuOpen = document.getElementById('navPages').classList.contains('active');
-            const isWelcomeModalOpen = document.getElementById('welcomeModal').classList.contains('active');
-            const isQrModalOpen = document.getElementById('qrModal').classList.contains('active');
-            const isModalOpen = isWelcomeModalOpen || isQrModalOpen;
-
-            // Only engage TV remote mode for specific keys
-            if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', 'Escape', 'Back'].includes(key)) return;
-            
-            isTvRemoteMode = true;
-            event.preventDefault(); 
-            
-            // Re-fetch elements if the list might have changed (e.g., filter applied, modal opened/closed)
-            focusableElements = getVisibleFocusableElements();
-
-            if (focusableElements.length === 0) {
-                focusIndex = -1;
-                return;
-            }
-
-            // --- Handle Escape/Back Key (Close Modals/Menus) ---
-            if (key === 'Escape' || key === 'Back') {
-                if (isWelcomeModalOpen) {
-                    document.getElementById('closeModalBtn').click();
-                } else if (isQrModalOpen) {
-                    document.getElementById('closeQrModalBtn').click();
-                } else if (isMobileMenuOpen) {
-                    document.getElementById('hamburger').click();
-                }
-                return;
-            }
-            
-            // --- Handle Enter Key (Simulate Click) ---
-            if (key === 'Enter') {
-                if (focusIndex > -1) {
-                    // Remove focus glow immediately before click action
-                    focusableElements[focusIndex].classList.remove('focused', 'scale'); 
-                    // Use a slight delay for re-evaluating focusable elements after the click action
-                    setTimeout(() => {
-                        focusableElements[focusIndex].click(); 
-                        focusableElements = getVisibleFocusableElements();
-                        if (focusIndex >= focusableElements.length) focusIndex = -1;
-                        if (focusIndex > -1) updateFocus(focusIndex);
-                    }, 50);
-                } else {
-                    // If nothing focused, try to click the first focusable element
-                    if (focusableElements[0]) focusableElements[0].click();
-                }
-                return;
-            }
-            
-            // --- Determine initial focus point if none is set ---
-            if (focusIndex === -1 || !focusableElements[focusIndex]) {
-                const firstChannelBtn = focusableElements.findIndex(el => el.classList.contains('channel-button'));
-                focusIndex = firstChannelBtn !== -1 ? firstChannelBtn : 0;
-            }
-            
-            let newIndex = focusIndex;
-
-            // --- Handle Arrow Keys (Next/Previous Focus) ---
-            switch (key) {
-                case 'ArrowDown':
-                    newIndex = (focusIndex + 1) % focusableElements.length;
-                    break;
-                case 'ArrowUp':
-                    newIndex = (focusIndex - 1 + focusableElements.length) % focusableElements.length;
-                    break;
-                case 'ArrowRight':
-                case 'ArrowLeft':
-                    // Basic lateral movement logic: prioritize channel buttons/category buttons
-                    const currentEl = focusableElements[focusIndex];
-                    const isCategoryBtn = currentEl.classList.contains('category-button');
-                    const isChannelBtn = currentEl.classList.contains('channel-button');
-
-                    if (isCategoryBtn) {
-                        const allCategoryButtons = Array.from(document.querySelectorAll('.category-button')).filter(el => window.getComputedStyle(el).display !== 'none');
-                        const catIndex = allCategoryButtons.indexOf(currentEl);
-                        
-                        if (key === 'ArrowRight' && catIndex < allCategoryButtons.length - 1) {
-                            newIndex = focusableElements.indexOf(allCategoryButtons[catIndex + 1]);
-                        } else if (key === 'ArrowLeft' && catIndex > 0) {
-                            newIndex = focusableElements.indexOf(allCategoryButtons[catIndex - 1]);
-                        } else {
-                            newIndex = (key === 'ArrowRight') ? (focusIndex + 1) % focusableElements.length : (focusIndex - 1 + focusableElements.length) % focusableElements.length;
-                        }
-                    } else if (isChannelBtn) {
-                        // Channel buttons are 1 per row, so treat left/right as up/down
-                        newIndex = (key === 'ArrowRight') ? (focusIndex + 1) % focusableElements.length : (focusIndex - 1 + focusableElements.length) % focusableElements.length;
-                    } else {
-                         // Default to standard linear navigation
-                        newIndex = (key === 'ArrowRight') ? (focusIndex + 1) % focusableElements.length : (focusIndex - 1 + focusableElements.length) % focusableElements.length;
-                    }
-                    break;
-            }
-            
-            updateFocus(newIndex);
-        }
-
-        // Add event listener for TV remote key handling
-        document.addEventListener('keydown', handleTvRemoteNavigation);
-
-        // Clear the focus when the user uses a mouse/touch
-        document.addEventListener('mousedown', (e) => {
-            isTvRemoteMode = false;
-            if (focusIndex > -1 && focusableElements[focusIndex]) {
-                focusableElements[focusIndex].classList.remove('focused', 'scale');
-                focusIndex = -1;
-            }
-        });
-        
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set up channels and sorting
-            sortedChannels = Object.entries(channels).sort((a, b) => a[1].name.localeCompare(b[1].name));
-
-            // Load state
-            loadFavoritesFromStorage();
-
-            // Setup UI interactions
-            setupSearch();
-            setupCategoryTabs();
-            setupWelcomeModal();
-            setupHamburgerMenu();
-            setupBackToTopButton();
-            setupQrCodeModal();
-            setupScrollReveal(); // Initialize the scroll animations
-
-            // Render initial channel list
-            renderChannelButtons();
-            resetChannelListScroll();
-
-            // Attach click handler to clearFavoritesBtn
-            const clearFavBtn = document.getElementById("clearFavoritesBtn");
-            if (clearFavBtn) {
-                clearFavBtn.addEventListener('click', clearAllFavorites);
-            }
-
-            // Set initial channel and start viewer count updates
-            const initialChannelKey = sortedChannels[0]?.[0] || Object.keys(channels)[0];
-            if (channels[initialChannelKey]) loadChannel(initialChannelKey);
-
-            updateViewerCount();
-            setInterval(updateViewerCount, 5000);
-            
-            // Initial calculation of focusable elements for TV Remote mode
-            focusableElements = getVisibleFocusableElements(); 
-        });
-        
-        // --- NOTIFICATION BANNER LOGIC ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const banner = document.getElementById('liveNotificationBanner');
-            const messageEl = document.getElementById('notificationMessage');
-            const closeBtn = document.getElementById('closeNotificationBtn');
-            const NOTIFICATION_URL = 'notification.json';
-            const SESSION_KEY = 'notificationClosed';
-            let currentNotificationId = null;
-
-            if (!banner || !messageEl || !closeBtn) {
-                return;
-            }
-
-            // --- Show/Hide Logic ---
-            function showBanner(message, type = 'alert', autoHide = true) {
-                messageEl.innerHTML = message;
-                banner.classList.remove('info', 'success', 'alert', 'hide');
-                banner.classList.add(type || 'alert');
-
-                banner.style.display = 'flex';
-                setTimeout(() => banner.classList.add('show'), 10);
-
-                if (autoHide) {
-                    setTimeout(() => hideBanner(), 8000);
-                }
-            }
-
-            function hideBanner() {
-                banner.classList.remove('show');
-                banner.classList.add('hide');
-                setTimeout(() => (banner.style.display = 'none'), 400);
-            }
-
-            // --- Close Button ---
-            closeBtn.addEventListener('click', () => {
-                hideBanner();
-                sessionStorage.setItem(SESSION_KEY, currentNotificationId || 'true');
-            });
-
-            // --- Fetch Notification ---
-            async function fetchNotification() {
-                try {
-                    // NOTE: This fetch call will fail in the current sandboxed environment
-                    // It will fall back to the hardcoded message defined in the HTML.
-                    const response = await fetch(`${NOTIFICATION_URL}?t=${Date.now()}`);
-                    if (!response.ok) throw new Error('Notification file not found.');
-
-                    const data = await response.json();
-                    const lastClosed = sessionStorage.getItem(SESSION_KEY);
-                    const shouldShow = data.show && (lastClosed !== data.id);
-
-                    currentNotificationId = data.id;
-
-                    if (shouldShow) showBanner(data.message, data.type);
-                    else hideBanner();
-                } catch (error) {
-                    // Default to showing the hardcoded message if fetch fails
-                    showBanner(messageEl.textContent, 'info', true);
-                }
-            }
-
-            // --- Run on Load + Every 60s ---
-            fetchNotification();
-            setInterval(fetchNotification, 60000);
-        });
-    </script>
 </body>
 </html>
