@@ -45,9 +45,7 @@
         html {
             scroll-behavior: smooth;
             /* FIX: Ensure the root viewport background is dark */
-            background-color: var(--bg-color);
-            /* Prevent horizontal scroll on the root level */
-            overflow-x: hidden; 
+            background-color: var(--bg-color); 
         }
 
         /* --- Custom Scrollbar Styling --- */
@@ -68,6 +66,12 @@
             background: #8b5cf6;
         }
         
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         body {
             /* Deep dark animated background */
             background: radial-gradient(circle at top left, #1a1c2e, #000000),
@@ -79,7 +83,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden; /* FIX: Global prevention of horizontal scroll */
+            overflow-x: hidden;
             background-size: 400% 400%; 
             
             /* FIX: Ensure background dark color during mobile overscroll/bounce */
@@ -429,7 +433,8 @@
             margin-left: 0;
             
             /* FIX: No horizontal scroll */
-            max-width: 100%; 
+            max-width: 100vw; 
+            overflow-x: hidden;
         }
 
         /* Search in Sidebar */
@@ -1600,7 +1605,7 @@ function renderChannelButtons(filter = "") {
         logo.src = channel.logo;
         logo.alt = channel.name;
         logo.className = "channel-logo";
-        logo.onerror = function() { this.style.backgroundColor = '#333'; this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMSA5djEwYTIgMiAwIDAgMS0yIDJNMTEgMTVhNSA1IDAgMSAwLTEwIDAgNSA1IDAgMCAwIDEwIDBtNSAyTDcgMTIiL3N2Zz4='; };
+        logo.onerror = function() { this.style.backgroundColor = '#333'; this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMSA5djEwYTIgMiAwIDAgMS0yIDJNMTEgMTVhNSA1IDAgMSAwLTEwIDAgNSA1IDAgMCAwIDEwIDBtNSAyTDcgMTIiLz48L3N2Zz4='; };
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "channel-name";
@@ -1780,9 +1785,19 @@ function setupHamburgerMenu() {
     if (!hamburger || !mobileMenu) return;
 
     hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        mobileMenu.classList.toggle('active');
-        body.classList.toggle('mobile-menu-active'); // Toggle scroll lock
+        const isActive = hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active', isActive);
+        body.classList.toggle('mobile-menu-active', isActive); // Toggle scroll lock
+        
+        if (isActive) {
+             // Set focus on first item in mobile menu
+            setTimeout(() => {
+                const firstLink = document.querySelector('#navPages a:first-child');
+                if (firstLink) setTvFocus(firstLink);
+            }, 100);
+        } else {
+            clearTvFocus();
+        }
     });
     
     // Fix 1: Handle navigation click and scrolling
@@ -1796,6 +1811,7 @@ function setupHamburgerMenu() {
             hamburger.classList.remove('active');
             mobileMenu.classList.remove('active');
             body.classList.remove('mobile-menu-active');
+            clearTvFocus();
             
             // Immediately scroll to the element position compensating for the fixed header
             if (targetElement) {
@@ -1843,6 +1859,9 @@ function setupWelcomeModal() {
 
     modal.classList.add('active');
     startCountdown();
+    
+    // Set focus on close button for TV remote control
+    setTimeout(() => { setTvFocus(closeBtn); }, 100);
 }
 
 function setupQrCodeModal() {
@@ -1854,11 +1873,16 @@ function setupQrCodeModal() {
     if (!qrCodeImage || !qrModal || !zoomedQrImage || !closeQrModalBtn) return;
 
     qrCodeImage.addEventListener('click', () => {
-        zoomedQrImage.src = qrCodeImage.src;
         qrModal.classList.add('active');
+        zoomedQrImage.src = qrCodeImage.src;
+        // Set focus on close button
+        setTimeout(() => setTvFocus(closeQrModalBtn), 50);
     });
 
-    const closeModal = () => qrModal.classList.remove('active');
+    const closeModal = () => {
+        qrModal.classList.remove('active');
+        clearTvFocus();
+    };
     closeQrModalBtn.addEventListener('click', closeModal);
     qrModal.addEventListener('click', (e) => { if (e.target === qrModal) closeModal(); });
 }
