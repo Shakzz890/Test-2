@@ -790,7 +790,7 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.4s ease, visibility 0.4s ease;
-            /* FIX 2: Ensure the overlay is full height to center content correctly */
+            /* FIX: Ensure the overlay is full height to center content correctly */
             height: 100%; 
         }
 
@@ -812,7 +812,7 @@
             border: 1px solid var(--glass-border);
             animation: modalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* REMOVED: margin: auto; Rely on parent flexbox for centering */
+            /* Rely on parent flexbox for centering */
         }
         
         @keyframes modalPop {
@@ -929,8 +929,9 @@
         }
 
         /* Updates List Alternating Logic */
-        .updates-scroll-container { margin-top: 3rem; }
-        .updates-scroll-container .update-item {
+        /* REMOVED: .updates-scroll-container */
+        .updates-container { margin-top: 3rem; }
+        .updates-container .update-item {
             background: rgba(255,255,255,0.02);
             padding: 25px;
             border-radius: 16px;
@@ -940,18 +941,18 @@
             transition: opacity 2.5s cubic-bezier(0.16, 1, 0.3, 1), transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
-        .updates-scroll-container .update-item h3 {
+        .updates-container .update-item h3 {
             color: #fff;
             font-size: 1.2rem;
             margin-bottom: 10px;
         }
         
-        .updates-scroll-container .update-item.reveal-init { opacity: 0; }
+        .updates-container .update-item.reveal-init { opacity: 0; }
         /* Left / Right Alternating */
-        .updates-scroll-container .update-item.reveal-init:nth-child(odd) { transform: translateX(-80px); }
-        .updates-scroll-container .update-item.reveal-init:nth-child(even) { transform: translateX(80px); }
+        .updates-container .update-item.reveal-init:nth-child(odd) { transform: translateX(-80px); }
+        .updates-container .update-item.reveal-init:nth-child(even) { transform: translateX(80px); }
         
-        .updates-scroll-container .update-item.active {
+        .updates-container .update-item.active {
             opacity: 1;
             transform: translateX(0);
         }
@@ -1204,7 +1205,7 @@
             <h2 class="lg-heading scroll-reveal reveal-init pop-up">Latest Updates</h2>
             
             <!-- List Items: Automatically alternates Left/Right via CSS nth-child -->
-            <div class="updates-scroll-container">
+            <div class="updates-container">
                 <div class="update-item scroll-reveal reveal-init">
                     <h3>Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
                     <p>We’ve introduced a new <strong>Live Notification System</strong> that allows instant announcements right inside the app! Notifications can now appear on-screen for important updates like new channels, live events, or maintenance alerts — without needing to refresh the page.</p>
