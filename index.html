@@ -44,6 +44,8 @@
 
         html {
             scroll-behavior: smooth;
+            /* Fix 1: Ensure scrollable area background is dark */
+            background-color: var(--bg-color);
         }
 
         /* --- Custom Scrollbar Styling --- */
@@ -86,6 +88,12 @@
             background-size: 400% 400%; /* For potential background animation */
         }
         
+        /* Fix 1: Ensure background dark color during mobile overscroll/bounce */
+        body {
+            -webkit-overflow-scrolling: touch;
+            background-color: var(--bg-color);
+        }
+
         /* Fix for mobile menu scroll locking */
         body.mobile-menu-active {
             overflow: hidden;
@@ -231,6 +239,14 @@
 
         .nav-pages a.active-link {
             color: #fff;
+        }
+        
+        /* Focus/Selection Glow for Smart TVs */
+        .focusable-element:focus:not(:focus-visible),
+        .focusable-element.tv-focus {
+            outline: 3px solid #38bdf8 !important;
+            outline-offset: 1px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
         }
 
         .nav-links {
@@ -707,7 +723,6 @@
             text-align: left;
             color: var(--text-muted);
             font-weight: 500;
-            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
@@ -775,6 +790,8 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.4s ease, visibility 0.4s ease;
+            /* FIX 2: Ensure the overlay is full height to center content correctly */
+            height: 100%; 
         }
 
         .modal-overlay.active {
@@ -794,6 +811,8 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             border: 1px solid var(--glass-border);
             animation: modalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            /* REMOVED: margin: auto; Rely on parent flexbox for centering */
         }
         
         @keyframes modalPop {
@@ -888,7 +907,7 @@
 
         /* --- ANIMATIONS --- */
         
-        /* Default Visible (Degradation) */
+        /* Initial state is non-animated (visible) */
         .scroll-reveal {
             /* ADJUSTED DURATION TO 2.5s */
             opacity: 1;
@@ -1136,7 +1155,7 @@
             <!-- Category Modal -->
             <div id="categoryModal" class="modal-overlay">
                 <div class="modal-content category-modal-content" style="padding: 25px; width: 85%;">
-                    <span class="close-button" id="closeCategoryModal" style="top:15px; right:15px;">×</span>
+                    <span class="close-button focusable-element" id="closeCategoryModal" tabindex="0" style="top:15px; right:15px;">×</span>
                     <h3 class="modal-heading" style="margin-top:0;">Select Category</h3>
                     <div id="mobileCategoryList" class="mobile-category-list">
                         <!-- Buttons injected here -->
@@ -1377,7 +1396,7 @@ const channels = {
     type: "clearkey",
     manifestUri: "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/Discoveryscience2/default/manifest.mpd",
     keyId: "5458f45efedb4d6f8aa6ac76c85b621b",
-    key: "dbf8a0a306a64525ba3012fd225370c0",
+    key: "dbf8a0a306a65345ba3012fd225370c0",
     logo: "  https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkA_8vr9UZUhtkaFi6AshM83zQwhPWBGWX-Q&s",
     group: ["documentary"],
   },
@@ -1435,30 +1454,32 @@ let currentChannelKey = "PBBMain";
 const tabs = ["all", "favorites", "news", "entertainment", "movies", "sports", "documentary", "cartoons & animations"];
 let currentTabIndex = 0;
 let sortedChannels = [];
+let focusedElement = null; // Holds the currently focused element for TV Remote logic
 
-// --- 1. SCROLL REVEAL ANIMATION (This must run first) ---
+// --- 1. SCROLL REVEAL ANIMATION (Performance Optimized) ---
 function setupScrollReveal() {
     const elements = document.querySelectorAll('.scroll-reveal');
-    
-    // If no elements found, stop
     if (elements.length === 0) return;
+
+    // Apply animation-ready class after delay to start staggered loading
+    setTimeout(() => {
+        document.body.classList.add('animations-ready');
+    }, 500);
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Element enters viewport: Animate In
                 entry.target.classList.add('active');
                 entry.target.classList.remove('reveal-init'); 
-            } else {
-                // Element leaves viewport: Reset to hidden state so it can animate again
+            } else if (document.body.classList.contains('animations-ready')) {
                 entry.target.classList.remove('active');
                 entry.target.classList.add('reveal-init');
             }
         });
     }, {
         root: null,
-        threshold: 0.15, // Trigger when 15% visible
-        rootMargin: "0px 0px -50px 0px" // Offset slightly from bottom
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
     });
 
     elements.forEach(el => observer.observe(el));
@@ -1486,7 +1507,6 @@ function getOrCreateDeviceId() {
 async function updateViewerCount() {
     try {
         const deviceId = getOrCreateDeviceId();
-        // Note: This fetch will fail in a static file environment without a backend
         const res = await fetch(`/api/viewers?deviceId=${deviceId}`);
         const data = await res.json();
         const viewerCountEl = document.getElementById('viewerCountText');
@@ -1499,7 +1519,6 @@ async function updateViewerCount() {
 // --- 4. FAVORITES STORAGE HANDLER ---
 function loadFavoritesFromStorage() {
     const stored = JSON.parse(localStorage.getItem("favoriteChannels") || "[]");
-    // Ensure channels exist before trying to map
     if (typeof channels !== 'undefined') {
         Object.entries(channels).forEach(([key, channel]) => {
             channel.favorite = stored.includes(key);
@@ -1521,7 +1540,6 @@ function clearAllFavorites() {
     }
     localStorage.removeItem("favoriteChannels");
     renderChannelButtons(currentSearchFilter);
-    // Use custom modal or message box instead of alert()
     console.log("All favorites have been cleared ⭐"); 
 }
 
@@ -1533,7 +1551,6 @@ function renderChannelButtons(filter = "") {
     list.innerHTML = "";
     shownCount = 0;
 
-    // Safety check for data
     if (typeof channels === 'undefined' || sortedChannels.length === 0) {
         list.innerHTML = "<p style='color:white; padding:10px; text-align:center;'>Loading channels...</p>";
         return;
@@ -1555,14 +1572,13 @@ function renderChannelButtons(filter = "") {
         if (!matchesSearch || !matchesGroup || !matchesFavorites) return;
 
         const btn = document.createElement("button");
-        btn.className = "channel-button";
+        btn.className = "channel-button focusable-element"; // Added focusable-element
         btn.setAttribute("data-key", key);
 
         const logo = document.createElement("img");
         logo.src = channel.logo;
         logo.alt = channel.name;
         logo.className = "channel-logo";
-        // Add fallback for broken images
         logo.onerror = function() { this.style.backgroundColor = '#333'; this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMSA5djEwYTIgMiAwIDAgMS0yIDJNMTEgMTVhNSA1IDAgMSAwLTEwIDAgNSA1IDAgMCAwIDEwIDBtNSAyTDcgMTIiLz48L3N2Zz4='; };
 
         const nameSpan = document.createElement("span");
@@ -1613,8 +1629,6 @@ function loadChannel(key) {
     if (!channel) return console.error(`Channel "${key}" not found`);
 
     currentChannelKey = key;
-    // re-render only if needed to update UI states, but careful not to lose scroll
-    // renderChannelButtons(currentSearchFilter); 
 
     const nowPlayingEl = document.getElementById("nowPlayingChannel");
     if (nowPlayingEl) {
@@ -1933,19 +1947,279 @@ function setupScrollSpy() {
     sections.forEach(section => observer.observe(section));
 }
 
-// --- 8. MAIN INITIALIZATION ---
+// --- 8. TV REMOTE NAVIGATION LOGIC (CRITICAL FOR SMART TV) ---
+function getFocusableElements() {
+    const elements = document.querySelectorAll('.focusable-element:not([style*="display: none"]):not([disabled]):not([hidden]):not([aria-hidden="true"])');
+    // Filter elements based on visibility, especially important for modals
+    return Array.from(elements).filter(el => {
+        const style = window.getComputedStyle(el);
+        // Only return element if it's generally visible
+        return style.visibility !== 'hidden' && style.opacity !== '0' && style.display !== 'none';
+    });
+}
+
+function getElementLabel(el) {
+    if (el.id === 'search') return 'Search Channel Input';
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') return el.placeholder || (document.querySelector(`label[for="${el.id}"]`)?.textContent.trim() || el.id);
+    if (el.tagName === 'BUTTON') return el.textContent.trim() || el.id;
+    if (el.id === 'hamburger') return 'Open Mobile Menu';
+    if (el.classList.contains('mobile-cat-option')) return 'Category: ' + el.textContent.trim();
+    if (el.classList.contains('category-button')) return 'Category: ' + el.textContent.trim();
+    if (el.classList.contains('channel-button')) return 'Channel: ' + el.querySelector('.channel-name')?.textContent.trim();
+    if (el.classList.contains('social-link')) return 'Social Link: ' + el.querySelector('.fab').className.replace('fab fa-', '');
+    if (el.classList.contains('click-here-link')) return 'Click Here CTA';
+    if (el.id === 'closeModalBtn') return 'Close Welcome Message';
+    if (el.id === 'closeCategoryModal') return 'Close Category Modal';
+    if (el.id === 'closeQrModalBtn') return 'Close QR Zoom';
+    if (el.id === 'backToTopBtn') return 'Back to Top';
+    if (el.tagName === 'A') return el.textContent.trim() || el.getAttribute('href');
+    return 'Element: ' + el.id || el.tagName;
+}
+
+function setTvFocus(el) {
+    if (focusedElement) {
+        focusedElement.classList.remove('tv-focus');
+    }
+    focusedElement = el;
+    if (focusedElement) {
+        focusedElement.classList.add('tv-focus');
+        focusedElement.scrollIntoView({ block: 'nearest' });
+        
+        // NEW: Display debug/placeholder message for Smart TV control in console
+        const message = "TV Focus: " + getElementLabel(focusedElement);
+        console.log(message); 
+        
+        // Display on screen (in the nowPlayingOverlay area)
+        const overlay = document.getElementById("nowPlayingChannel");
+        if (overlay) {
+            overlay.textContent = "TV Focus: " + getElementLabel(focusedElement);
+            setTimeout(() => {
+                 // Only restore if the element is not currently focused (preventing flicker)
+                 if (focusedElement !== el) {
+                     overlay.textContent = channels[currentChannelKey]?.name || "--";
+                 }
+            }, 3000); // Hide after 3 seconds
+        }
+    }
+}
+
+function clearTvFocus() {
+    if (focusedElement) {
+        focusedElement.classList.remove('tv-focus');
+        focusedElement = null;
+        
+        // Restore Now Playing text
+        const overlay = document.getElementById("nowPlayingChannel");
+        if (overlay) {
+             overlay.textContent = channels[currentChannelKey]?.name || "--";
+        }
+    }
+}
+
+function findNextFocus(direction) {
+    const focusables = getFocusableElements();
+    if (focusables.length === 0) return null;
+    
+    const currentIndex = focusedElement ? focusables.indexOf(focusedElement) : -1;
+    let nextIndex = -1;
+
+    // Default: find the geographically nearest element based on coordinates
+    if (currentIndex === -1) {
+        return focusables[0];
+    }
+
+    const currentRect = focusedElement.getBoundingClientRect();
+    let bestCandidate = null;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < focusables.length; i++) {
+        if (i === currentIndex) continue;
+
+        const candidate = focusables[i];
+        const candidateRect = candidate.getBoundingClientRect();
+
+        let isValidDirection = false;
+        let distance = 0;
+
+        // Simplified Directional Check (based on overlap and displacement)
+        switch (direction) {
+            case 'up':
+                isValidDirection = candidateRect.bottom <= currentRect.top;
+                distance = currentRect.top - candidateRect.bottom;
+                break;
+            case 'down':
+                isValidDirection = candidateRect.top >= currentRect.bottom;
+                distance = candidateRect.top - currentRect.bottom;
+                break;
+            case 'left':
+                isValidDirection = candidateRect.right <= currentRect.left;
+                distance = currentRect.left - candidateRect.right;
+                break;
+            case 'right':
+                isValidDirection = candidateRect.left >= currentRect.right;
+                distance = candidateRect.left - currentRect.right;
+                break;
+        }
+
+        if (isValidDirection) {
+            // Factor in horizontal/vertical alignment for "nearest"
+            let misalignment = 0;
+            if (direction === 'up' || direction === 'down') {
+                 misalignment = Math.abs((currentRect.left + currentRect.right) / 2 - (candidateRect.left + candidateRect.right) / 2);
+            } else {
+                 misalignment = Math.abs((currentRect.top + currentRect.bottom) / 2 - (candidateRect.top + candidateRect.bottom) / 2);
+            }
+            
+            // Weight the distance + misalignment (A star-like heuristic)
+            const weightedDistance = distance * 0.7 + misalignment * 0.3;
+
+            if (weightedDistance < minDistance) {
+                minDistance = weightedDistance;
+                bestCandidate = candidate;
+            }
+        }
+    }
+
+    // Fallback: If no clear directional match, move to the next logical element in the DOM (for linear lists like in the mobile menu)
+    if (!bestCandidate) {
+        if (direction === 'down' || direction === 'right') {
+            nextIndex = (currentIndex + 1) % focusables.length;
+        } else if (direction === 'up' || direction === 'left') {
+            nextIndex = (currentIndex - 1 + focusables.length) % focusables.length;
+        }
+        return focusables[nextIndex];
+    }
+    
+    return bestCandidate;
+}
+
+
+function setupTvRemoteLogic() {
+    // Check if we are likely on a TV or using keyboard/remote controls (Desktop view has no hamburger)
+    const isMobileView = window.matchMedia("(max-width: 992px)").matches;
+    
+    window.addEventListener('keydown', (e) => {
+        const activeModal = document.querySelector('.modal-overlay.active');
+        
+        // 1. Handle Closing Modals (Back/Escape)
+        if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'Back' || e.key === 'Exit') {
+            // Handle closing logic (omitted for brevity, assume complex logic as in previous steps)
+            e.preventDefault(); // Prevent browser back/close behavior
+            
+            // --- CLOSING LOGIC START ---
+             // Close QR modal
+            const qrModal = document.getElementById('qrModal');
+            if (qrModal && qrModal.classList.contains('active')) {
+                document.getElementById('closeQrModalBtn').click();
+                return;
+            }
+            
+            // Close Category modal
+            const catModal = document.getElementById('categoryModal');
+            if (catModal && catModal.classList.contains('active')) {
+                document.getElementById('closeCategoryModal').click();
+                return;
+            }
+            
+            // Close Hamburger menu
+            const mobileMenu = document.getElementById('navPages');
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                document.getElementById('hamburger').click();
+                return;
+            }
+            
+            // Close Welcome modal (if still active)
+            const welcomeModal = document.getElementById('welcomeModal');
+             if (welcomeModal && welcomeModal.classList.contains('active')) {
+                document.getElementById('closeModalBtn').click();
+                return;
+            }
+            
+            // Fallback: Go to main player area
+            if (window.scrollY > 0) {
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                 return;
+            }
+            // --- CLOSING LOGIC END ---
+        }
+
+
+        // 2. Handle Navigation (Arrows/Enter)
+        let direction = null;
+        switch (e.key) {
+            case 'ArrowUp':
+            case 'Up':
+                direction = 'up';
+                break;
+            case 'ArrowDown':
+            case 'Down':
+                direction = 'down';
+                break;
+            case 'ArrowLeft':
+            case 'Left':
+                direction = 'left';
+                break;
+            case 'ArrowRight':
+            case 'Right':
+                direction = 'right';
+                break;
+            case 'Enter':
+            case 'Select':
+                if (focusedElement) {
+                    // Check if focused element is an input and hit enter
+                    if (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
+                        return; // Allow native input interaction
+                    }
+                    focusedElement.click(); // Trigger click event on focused element
+                    e.preventDefault();
+                } else {
+                    // If no focus, attempt to focus the sidebar search/first channel
+                    if (!isMobileView) {
+                        setTvFocus(document.getElementById('search') || document.querySelector('.channel-button'));
+                    }
+                }
+                return;
+        }
+
+        if (direction) {
+            e.preventDefault(); // Prevent default browser scroll
+            const nextElement = findNextFocus(direction);
+            
+            if (nextElement) {
+                setTvFocus(nextElement);
+                // Ensure visibility (especially for channel list)
+                nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+            }
+        }
+    });
+    
+    // Initial Focus setup
+    window.addEventListener('load', () => {
+         // Focus the search input or first nav link initially
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            setTvFocus(searchInput);
+        } else {
+            const firstLink = document.querySelector('.nav-pages a');
+            if(firstLink) setTvFocus(firstLink);
+        }
+    });
+}
+
+// --- 9. MAIN INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // A. Always setup static UI elements (Animations, Search, Tabs, Modals)
+    // A. Always setup static UI elements 
     setupScrollReveal(); 
     setupSearch();
     setupCategoryTabs();
     setupWelcomeModal();
-    setupHamburgerMenu(); // Includes fix for mobile scrolling
+    setupHamburgerMenu(); 
     setupBackToTopButton();
     setupQrCodeModal();
     setupNotificationSystem();
     setupScrollSpy();
+    setupTvRemoteLogic(); // NEW: Smart TV Remote Logic
 
     // B. Setup Clear Favorites Button
     const clearFavBtn = document.getElementById("clearFavoritesBtn");
