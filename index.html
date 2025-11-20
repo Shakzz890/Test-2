@@ -768,9 +768,11 @@
 
         /* --- MODAL (Modern Glass) --- */
         .modal-overlay {
-            display: flex;
+            /* FIX 1: Use Flexbox centering on the overlay for better vertical reliability */
+            display: flex; 
             align-items: center;
             justify-content: center;
+            
             position: fixed;
             inset: 0;
             background: rgba(5, 5, 10, 0.7);
@@ -779,8 +781,7 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.4s ease, visibility 0.4s ease;
-            /* FIX: Ensure the overlay is full height to center content correctly */
-            height: 100%; 
+            height: 100vh; /* Use 100vh for fixed modals */
         }
 
         .modal-overlay.active {
@@ -796,19 +797,24 @@
             max-width: 500px;
             width: 90%;
             text-align: center;
+            
+            /* Removed absolute positioning and transform in favor of parent flex centering */
             position: relative;
+            transform: none; 
+            top: auto;
+            left: auto;
+            
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             border: 1px solid var(--glass-border);
             animation: modalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            
-            /* Rely on parent flexbox for centering */
         }
         
         @keyframes modalPop {
-            from { opacity: 0; transform: scale(0.9) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            /* Adjusted keyframes to work with relative/flex centering */
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
-
+        
         .close-button {
             position: absolute;
             top: 20px;
@@ -917,8 +923,7 @@
             transform: scale(1) translateX(0) translateY(0);
         }
 
-        /* Updates List Alternating Logic */
-        /* REMOVED: .updates-scroll-container */
+        /* Updates List Alternating Logic - FIX 2: Use direct structure to match About/Privacy */
         .updates-container { margin-top: 3rem; }
         .updates-container .update-item {
             background: rgba(255,255,255,0.02);
@@ -926,7 +931,6 @@
             border-radius: 16px;
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.05);
-            /* ADJUSTED DURATION TO 2.5s */
             transition: opacity 2.5s cubic-bezier(0.16, 1, 0.3, 1), transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
@@ -1028,7 +1032,6 @@
             gap: 15px;
         }
         .notification-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
-        .notification-banner.info { border-left: 4px solid #38bdf8; }
         
         /* Utility */
         .neon-bubble {
@@ -1194,58 +1197,39 @@
             <!-- Heading: POP UP -->
             <h2 class="lg-heading scroll-reveal reveal-init pop-up">Latest Updates</h2>
             
-            <!-- List Items: Using the simplified updates-container class -->
+            <!-- List Items: Structured to match the simple flow of the other sections -->
             <div class="updates-container">
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
-                    <p>We’ve introduced a new <strong>Live Notification System</strong> that allows instant announcements right inside the app! Notifications can now appear on-screen for important updates like new channels, live events, or maintenance alerts — without needing to refresh the page.</p>
-                </div>
+                <!-- Use standard paragraph/heading structure mirroring the 'About' section -->
+                <h3 class="scroll-reveal reveal-init slide-left">Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
+                <p class="scroll-reveal reveal-init slide-right">We’ve introduced a new <strong>Live Notification System</strong> that allows instant announcements right inside the app! Notifications can now appear on-screen for important updates like new channels, live events, or maintenance alerts — without needing to refresh the page.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>TV Remote Compatibility <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
-                    <p>Shakzz TV web app is now fully <strong>Smart TV compatible!</strong> You can navigate the entire interface using your remote’s arrow keys, press <strong>Enter</strong> to play channels instantly, and use <strong>Back</strong> or <strong>Esc</strong> to close menus or modals.</p>
-                    <p>Supported platforms include <strong>Android TV, Fire TV, Tizen,</strong> and <strong>WebOS</strong>. Plus, you’ll enjoy smoother transitions and a new soft blue focus glow for clearer navigation.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-left">TV Remote Compatibility <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
+                <p class="scroll-reveal reveal-init slide-right">Shakzz TV web app is now fully <strong>Smart TV compatible!</strong> You can navigate the entire interface using your remote’s arrow keys, press <strong>Enter</strong> to play channels instantly, and use <strong>Back</strong> or <strong>Esc</strong> to close menus or modals.</p>
+                <p class="scroll-reveal reveal-init slide-left">Supported platforms include <strong>Android TV, Fire TV, Tizen,</strong> and <strong>WebOS</strong>. Plus, you’ll enjoy smoother transitions and a new soft blue focus glow for clearer navigation.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Newly Added Feature: Favorites <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                    <p>You can now mark your favorite channels with a star! Easily access them from the "Favorites" tab in the sidebar for quick viewing.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Newly Added Feature: Favorites <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">You can now mark your favorite channels with a star! Easily access them from the "Favorites" tab in the sidebar for quick viewing.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Now Playing Display <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                    <p>You'll now see a "Now Playing" overlay at the top of the player, telling you exactly which channel is currently live. No more guessing!</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Now Playing Display <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">You'll now see a "Now Playing" overlay at the top of the player, telling you exactly which channel is currently live. No more guessing!</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                    <p>Our library is growing! We've just added 7 new international and local channels, bringing our total to 124. Discover them in the sidebar!</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">Our library is growing! We've just added 7 new international and local channels, bringing our total to 124. Discover them in the sidebar!</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Major Platform Upgrade <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span></h3>
-                    <p>We've rolled out a significant update to improve streaming stability, reduce buffering, and enhance overall performance across all devices. Enjoy a smoother viewing experience!</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Major Platform Upgrade <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">We've rolled out a significant update to improve streaming stability, reduce buffering, and enhance overall performance across all devices. Enjoy a smoother viewing experience!</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span> </h3>
-                    <p>We've expanded our library with 07 new international and local channels. Check them out in the sidebar category list.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span> </h3>
+                <p class="scroll-reveal reveal-init slide-left">We've expanded our library with 07 new international and local channels. Check them out in the sidebar category list.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Mobile UI Overhaul <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-08-24]</span></h3>
-                    <p>Our website is now fully responsive and optimized for mobile devices. The new layout ensures a great viewing experience whether you're on a desktop, tablet, or smartphone.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Mobile UI Overhaul <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-08-24]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">Our website is now fully responsive and optimized for mobile devices. The new layout ensures a great viewing experience whether you're on a desktop, tablet, or smartphone.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Search and Filtering Added <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
-                    <p>Finding your favorite channel is now easier than ever! We've implemented a brand new search bar and category filters in the sidebar to help you navigate our growing channel list.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Search and Filtering Added <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">Finding your favorite channel is now easier than ever! We've implemented a brand new search bar and category filters in the sidebar to help you navigate our growing channel list.</p>
 
-                <div class="update-item scroll-reveal reveal-init">
-                    <h3>Official Launch <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
-                    <p>Welcome to Shakzz TV! After months of development, our platform is now live. We're excited to provide a free, high-quality streaming service for everyone.</p>
-                </div>
+                <h3 class="scroll-reveal reveal-init slide-right">Official Launch <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
+                <p class="scroll-reveal reveal-init slide-left">Welcome to Shakzz TV! After months of development, our platform is now live. We're excited to provide a free, high-quality streaming service for everyone.</p>
             </div>
         </div>
     </section>
@@ -2116,13 +2100,6 @@ function setupTvRemoteLogic() {
             const mobileMenu = document.getElementById('navPages');
             if (mobileMenu && mobileMenu.classList.contains('active')) {
                 document.getElementById('hamburger').click();
-                return;
-            }
-            
-            // Close Welcome modal (if still active)
-            const welcomeModal = document.getElementById('welcomeModal');
-             if (welcomeModal && welcomeModal.classList.contains('active')) {
-                document.getElementById('closeModalBtn').click();
                 return;
             }
             
