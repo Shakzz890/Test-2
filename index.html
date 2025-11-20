@@ -44,12 +44,11 @@
 
         html {
             scroll-behavior: smooth;
-            /* Fix 1: Ensure scrollable area background is dark */
-            background-color: var(--bg-color);
+            /* FIX: Ensure the root viewport background is dark */
+            background-color: var(--bg-color); 
         }
 
         /* --- Custom Scrollbar Styling --- */
-        /* Target the main scrollable element: .scrollable-list */
         .scrollable-list::-webkit-scrollbar {
             width: 8px;
         }
@@ -64,15 +63,9 @@
             background-clip: padding-box;
         }
         .scrollable-list::-webkit-scrollbar-thumb:hover {
-            background: #8b5cf6; /* A slightly lighter purple/blue on hover */
+            background: #8b5cf6;
         }
         
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         body {
             /* Deep dark animated background */
             background: radial-gradient(circle at top left, #1a1c2e, #000000),
@@ -85,13 +78,11 @@
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
-            background-size: 400% 400%; /* For potential background animation */
-        }
-        
-        /* Fix 1: Ensure background dark color during mobile overscroll/bounce */
-        body {
+            background-size: 400% 400%; 
+            
+            /* FIX: Ensure background dark color during mobile overscroll/bounce */
             -webkit-overflow-scrolling: touch;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color); 
         }
 
         /* Fix for mobile menu scroll locking */
@@ -184,7 +175,6 @@
 
         .logo-text {
             font-size: 1.5em;
-            /* Modern Gradient Text */
             background: linear-gradient(120deg, #38bdf8, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -209,7 +199,6 @@
             top: 5px;
             left: 5px;
             height: calc(100% - 10px);
-            /* UPDATED: Royal Blue Background + Glow */
             background: #4169e1; 
             box-shadow: 0 0 12px rgba(65, 105, 225, 0.6);
             border-radius: 40px;
@@ -985,7 +974,8 @@
             .hamburger { display: flex; }
             .click-here-link { display: none; }
             .info-section {
-                margin: 2rem 10px;
+                /* Reduced vertical margin for tight stacking on mobile */
+                margin: 2rem 10px; 
                 padding: 2rem;
             }
             .contact-container { flex-direction: column; gap: 3rem; }
@@ -1204,7 +1194,7 @@
             <!-- Heading: POP UP -->
             <h2 class="lg-heading scroll-reveal reveal-init pop-up">Latest Updates</h2>
             
-            <!-- List Items: Automatically alternates Left/Right via CSS nth-child -->
+            <!-- List Items: Using the simplified updates-container class -->
             <div class="updates-container">
                 <div class="update-item scroll-reveal reveal-init">
                     <h3>Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
