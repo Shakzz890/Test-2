@@ -530,6 +530,30 @@
             background: rgba(255,255,255,0.1);
         }
 
+        /* ✨ AI Remote Button Style */
+        #aiMagicBtn {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 0 20px 15px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+            width: calc(100% - 40px); /* Match search bar width */
+        }
+        #aiMagicBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
+        }
+
         /* Channel List Area */
         #channelCount {
             padding: 10px 20px;
@@ -785,28 +809,24 @@
 
         /* --- MODAL (FIX: Matched with Hamburger Menu Overlay) --- */
         .modal-overlay {
-            /* CRITICAL FIX: Copying the exact centering logic from .mobile-nav-pages */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            /* FIX: Use Flexbox centering on the overlay for reliable alignment */
+            display: flex; 
+            flex-direction: column; 
             align-items: center;
-            gap: 30px;
+            justify-content: center;
             
-            /* Fullscreen fixed position covering everything */
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw; /* Use 100vw to ensure it spans viewport */
-            height: 100vh; /* Use 100vh to ensure it spans viewport */
+            width: 100vw;
+            height: 100vh;
             
-            background: rgba(0, 0, 0, 0.7); /* Consistent dark overlay */
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            
-            z-index: 2000; /* Higher than header */
+            background: rgba(5, 5, 10, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
             visibility: hidden;
             opacity: 0;
-            transition: all 0.4s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
         .modal-overlay.active {
@@ -815,60 +835,63 @@
         }
 
         .modal-content {
-            /* Removing heavy background to match "open" feel, or keep if desired */
-            background: rgba(20, 20, 25, 0.95); 
+            background: rgba(20, 20, 25, 0.9);
             color: #fff;
-            padding: 30px;
+            padding: 40px;
             border-radius: 24px;
             max-width: 500px;
-            width: 85%; /* Slightly narrower for mobile safety */
+            width: 90%;
             text-align: center;
             
-            /* Reset absolute/transform. Flex parent handles centering. */
+            /* Rely on parent flexbox for centering, remove absolute/transform */
             position: relative;
+            transform: none; 
             top: auto;
             left: auto;
-            transform: none;
             
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             border: 1px solid var(--glass-border);
+            animation: modalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             
-            /* FIX: Remove animation conflict that overrides centering */
-            animation: fadeInScale 0.3s ease-out; 
-            
-            /* Ensure it doesn't overflow screen */
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
+            /* Ensure content doesn't overflow screen vertically */
+            max-height: 90vh;
+            overflow-y: auto;
+            /* Hide scrollbar for clean look */
+            scrollbar-width: none; 
         }
         
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.95); }
+        .modal-content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        @keyframes modalPop {
+            /* Adjusted keyframes to work with relative/flex centering */
+            from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
 
         .close-button {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px; /* Larger hit area */
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
             cursor: pointer;
             color: #fff;
-            width: 40px;
-            height: 40px;
+            transition: 0.2s;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
-            z-index: 10;
         }
-        .close-button:hover { background: #ef4444; }
+        .close-button:hover { background: #ef4444; transform: rotate(90deg); }
 
         .modal-heading {
             margin-top: 10px;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -878,40 +901,24 @@
         .mobile-category-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            /* FIX: Ensure scrolling if list is too long for screen, but hidden if fits */
-            overflow-y: auto; 
-            flex-grow: 1; /* Take available space */
-            margin-top: 0;
-            padding-bottom: 10px;
-            
-            /* Hide Scrollbar for aesthetics */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE 10+ */
-        }
-        .mobile-category-list::-webkit-scrollbar { 
-            display: none; /* Chrome/Safari */
+            gap: 8px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-top: 20px;
         }
         
         .mobile-cat-option {
-            background: rgba(255,255,255,0.08);
-            padding: 16px;
-            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
             text-align: left;
             font-weight: 600;
-            font-size: 1.1rem; /* Larger text for touch */
             cursor: pointer;
             transition: 0.2s;
-            border: 1px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         .mobile-cat-option:hover, .mobile-cat-option.active {
             background: var(--accent-gradient);
             color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         /* Back-to-Top Modern */
@@ -1016,9 +1023,6 @@
                 border-left: none;
                 border-top: 1px solid var(--glass-border);
                 margin-top: 0;
-                /* FIX: Prevent horizontal swipe/scroll on sidebar on mobile */
-                overflow-x: hidden;
-                max-width: 100vw;
             }
             /* Show Mobile Category Button, Hide Desktop Bar */
             .category-bar { display: none; }
@@ -1045,7 +1049,7 @@
             }
             #contact.info-section {
                 /* Reset for mobile view where sections are stacked */
-                border-radius: 33px; 
+                border-radius: 30px; 
             }
         }
         
@@ -1083,6 +1087,7 @@
             gap: 15px;
         }
         .notification-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .notification-banner.info { border-left: 4px solid #38bdf8; }
         
         /* Utility */
         .neon-bubble {
@@ -1199,9 +1204,9 @@
 
             <!-- Category Modal -->
             <div id="categoryModal" class="modal-overlay">
-                <div class="modal-content category-modal-content">
-                    <span class="close-button focusable-element" id="closeCategoryModal" tabindex="0">×</span>
-                    <h3 class="modal-heading">Select Category</h3>
+                <div class="modal-content category-modal-content" style="padding: 25px; width: 85%;">
+                    <span class="close-button focusable-element" id="closeCategoryModal" tabindex="0" style="top:15px; right:15px;">×</span>
+                    <h3 class="modal-heading" style="margin-top:0;">Select Category</h3>
                     <div id="mobileCategoryList" class="mobile-category-list">
                         <!-- Buttons injected here -->
                     </div>
@@ -1248,39 +1253,58 @@
             <!-- Heading: POP UP -->
             <h2 class="lg-heading scroll-reveal reveal-init pop-up">Latest Updates</h2>
             
-            <!-- List Items: Structured to match the simple flow of the other sections -->
-            <div class="updates-container">
-                <!-- Use standard paragraph/heading structure mirroring the 'About' section -->
-                <h3 class="scroll-reveal reveal-init slide-left">Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
-                <p class="scroll-reveal reveal-init slide-right">We’ve introduced a new <strong>Live Notification System</strong> that allows instant announcements right inside the app! Notifications can now appear on-screen for important updates like new channels, live events, or maintenance alerts — without needing to refresh the page.</p>
+            <!-- List Items: Automatically alternates Left/Right via CSS nth-child -->
+            <div class="updates-scroll-container">
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Live Notification <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
+                    <p>We’ve introduced a new <strong>Live Notification System</strong> that allows instant announcements right inside the app! Notifications can now appear on-screen for important updates like new channels, live events, or maintenance alerts — without needing to refresh the page.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-left">TV Remote Compatibility <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
-                <p class="scroll-reveal reveal-init slide-right">Shakzz TV web app is now fully <strong>Smart TV compatible!</strong> You can navigate the entire interface using your remote’s arrow keys, press <strong>Enter</strong> to play channels instantly, and use <strong>Back</strong> or <strong>Esc</strong> to close menus or modals.</p>
-                <p class="scroll-reveal reveal-init slide-left">Supported platforms include <strong>Android TV, Fire TV, Tizen,</strong> and <strong>WebOS</strong>. Plus, you’ll enjoy smoother transitions and a new soft blue focus glow for clearer navigation.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>TV Remote Compatibility <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-11-08]</span></h3>
+                    <p>Shakzz TV web app is now fully <strong>Smart TV compatible!</strong> You can navigate the entire interface using your remote’s arrow keys, press <strong>Enter</strong> to play channels instantly, and use <strong>Back</strong> or <strong>Esc</strong> to close menus or modals.</p>
+                    <p>Supported platforms include <strong>Android TV, Fire TV, Tizen,</strong> and <strong>WebOS</strong>. Plus, you’ll enjoy smoother transitions and a new soft blue focus glow for clearer navigation.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Newly Added Feature: Favorites <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">You can now mark your favorite channels with a star! Easily access them from the "Favorites" tab in the sidebar for quick viewing.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Newly Added Feature: Favorites <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                    <p>You can now mark your favorite channels with a star! Easily access them from the "Favorites" tab in the sidebar for quick viewing.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Now Playing Display <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">You'll now see a "Now Playing" overlay at the top of the player, telling you exactly which channel is currently live. No more guessing!</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Now Playing Display <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                    <p>You'll now see a "Now Playing" overlay at the top of the player, telling you exactly which channel is currently live. No more guessing!</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">Our library is growing! We've just added 7 new international and local channels, bringing our total to 124. Discover them in the sidebar!</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-10-07]</span></h3>
+                    <p>Our library is growing! We've just added 7 new international and local channels, bringing our total to 124. Discover them in the sidebar!</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Major Platform Upgrade <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">We've rolled out a significant update to improve streaming stability, reduce buffering, and enhance overall performance across all devices. Enjoy a smoother viewing experience!</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Major Platform Upgrade <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span></h3>
+                    <p>We've rolled out a significant update to improve streaming stability, reduce buffering, and enhance overall performance across all devices. Enjoy a smoother viewing experience!</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span> </h3>
-                <p class="scroll-reveal reveal-init slide-left">We've expanded our library with 07 new international and local channels. Check them out in the sidebar category list.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>New Channels Added! <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-09-24]</span> </h3>
+                    <p>We've expanded our library with 07 new international and local channels. Check them out in the sidebar category list.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Mobile UI Overhaul <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-08-24]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">Our website is now fully responsive and optimized for mobile devices. The new layout ensures a great viewing experience whether you're on a desktop, tablet, or smartphone.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Mobile UI Overhaul <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-08-24]</span></h3>
+                    <p>Our website is now fully responsive and optimized for mobile devices. The new layout ensures a great viewing experience whether you're on a desktop, tablet, or smartphone.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Search and Filtering Added <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">Finding your favorite channel is now easier than ever! We've implemented a brand new search bar and category filters in the sidebar to help you navigate our growing channel list.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Search and Filtering Added <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
+                    <p>Finding your favorite channel is now easier than ever! We've implemented a brand new search bar and category filters in the sidebar to help you navigate our growing channel list.</p>
+                </div>
 
-                <h3 class="scroll-reveal reveal-init slide-right">Official Launch <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
-                <p class="scroll-reveal reveal-init slide-left">Welcome to Shakzz TV! After months of development, our platform is now live. We're excited to provide a free, high-quality streaming service for everyone.</p>
+                <div class="update-item scroll-reveal reveal-init">
+                    <h3>Official Launch <span class="update-date" style="font-size:0.8em; opacity:0.7;">[2025-07-24]</span></h3>
+                    <p>Welcome to Shakzz TV! After months of development, our platform is now live. We're excited to provide a free, high-quality streaming service for everyone.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -1605,7 +1629,7 @@ function renderChannelButtons(filter = "") {
         logo.src = channel.logo;
         logo.alt = channel.name;
         logo.className = "channel-logo";
-        logo.onerror = function() { this.style.backgroundColor = '#333'; this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMSA5djEwYTIgMiAwIDAgMS0yIDJNMTEgMTVhNSA1IDAgMSAwLTEwIDAgNSA1IDAgMCAwIDEwIDBtNSAyTDcgMTIiLz48L3N2Zz4='; };
+        logo.onerror = function() { this.style.backgroundColor = '#333'; this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiPjxwYXRoIGQ9Ik0yMSA5djEwYTIgMiAwIDAgMS0yIDJNMTEgMTVhNSA1IDAgMSAwLTEwIDAgNSA1IDAgMCAwIDEwIDBtNSAyTDcgMTIiL3N2Zz4='; };
 
         const nameSpan = document.createElement("span");
         nameSpan.className = "channel-name";
@@ -1768,7 +1792,14 @@ function setupCategoryTabs() {
     const closeCategoryModal = document.getElementById("closeCategoryModal");
 
     if(mobileCategoryBtn && categoryModal && closeCategoryModal) {
-        mobileCategoryBtn.addEventListener('click', () => categoryModal.classList.add('active'));
+        mobileCategoryBtn.addEventListener('click', () => {
+            categoryModal.classList.add('active');
+            // Set focus on the first category option in the modal
+            setTimeout(() => {
+                const firstCat = document.querySelector('#mobileCategoryList .focusable-element');
+                if(firstCat) setTvFocus(firstCat);
+            }, 100);
+        });
         closeCategoryModal.addEventListener('click', () => categoryModal.classList.remove('active'));
         categoryModal.addEventListener('click', (e) => {
             if (e.target === categoryModal) categoryModal.classList.remove('active');
@@ -1853,10 +1884,7 @@ function setupWelcomeModal() {
 
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-    document.querySelectorAll("nav a, .mobile-nav-pages a").forEach(link => {
-        link.addEventListener("click", () => { if (modal.classList.contains('active')) closeModal(); });
-    });
-
+    
     modal.classList.add('active');
     startCountdown();
     
