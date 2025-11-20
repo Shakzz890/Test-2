@@ -550,8 +550,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            /* Add transform to channel list as well to ensure it stays on its layer */
-            transform: translateZ(0);
         }
 
         .channel-button {
@@ -774,9 +772,9 @@
             font-size: 0.85rem;
         }
 
-        /* --- MODAL (Modern Glass - Fully Centered) --- */
+        /* --- MODAL (Modern Glass) --- */
         .modal-overlay {
-            /* Use Flexbox for perfect centering on all screens */
+            /* FIX: Use Flexbox centering on the overlay for reliable alignment */
             display: flex; 
             flex-direction: column; 
             align-items: center;
@@ -809,7 +807,13 @@
             max-width: 500px;
             width: 90%;
             text-align: center;
-            position: relative; /* Let flexbox handle position */
+            
+            /* Rely on parent flexbox for centering, remove absolute/transform */
+            position: relative;
+            transform: none; 
+            top: auto;
+            left: auto;
+            
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             border: 1px solid var(--glass-border);
             animation: modalPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -826,6 +830,7 @@
         }
         
         @keyframes modalPop {
+            /* Adjusted keyframes to work with relative/flex centering */
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
@@ -862,9 +867,9 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            width: 100%;
+            /* Removed max-height and overflow-y to show all categories */
             max-height: none; 
-            overflow-y: visible;
+            overflow-y: hidden;
             margin-top: 20px;
         }
         
@@ -939,7 +944,7 @@
             transform: scale(1) translateX(0) translateY(0);
         }
 
-        /* Updates List Alternating Logic - FIX 2: Use direct structure to match About/Privacy */
+        /* Updates List Alternating Logic - Use direct structure to match About/Privacy */
         .updates-container { margin-top: 3rem; }
         .updates-container .update-item {
             background: rgba(255,255,255,0.02);
