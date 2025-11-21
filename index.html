@@ -1197,17 +1197,6 @@
                 <i class="fas fa-chevron-down"></i>
             </button>
 
-            <!-- Category Modal -->
-            <div id="categoryModal" class="modal-overlay">
-                <div class="modal-content category-modal-content" style="padding: 25px; width: 85%;">
-                    <span class="close-button focusable-element" id="closeCategoryModal" tabindex="0" style="top:15px; right:15px;">×</span>
-                    <h3 class="modal-heading" style="margin-top:0;">Select Category</h3>
-                    <div id="mobileCategoryList" class="mobile-category-list">
-                        <!-- Buttons injected here -->
-                    </div>
-                </div>
-            </div>
-
             <button id="clearFavoritesBtn" class="clear-fav-btn focusable-element" style="display:none;">
                 <i class="fas fa-trash"></i> Clear Favorites
             </button>
@@ -1378,6 +1367,17 @@
             <span class="close-button focusable-element" id="closeModalBtn" tabindex="0">×</span>
             <h2 class="modal-heading">Welcome to Shakzz TV!</h2>
             <p class="modal-text">Enjoy a curated selection of local and international channels, available 24/7.</p>
+        </div>
+    </div>
+    
+    <!-- CATEGORY MODAL - MOVED HERE (outside sidebar) -->
+    <div id="categoryModal" class="modal-overlay">
+        <div class="modal-content category-modal-content" style="padding: 25px; width: 85%;">
+            <span class="close-button focusable-element" id="closeCategoryModal" tabindex="0" style="top:15px; right:15px;">×</span>
+            <h3 class="modal-heading" style="margin-top:0;">Select Category</h3>
+            <div id="mobileCategoryList" class="mobile-category-list">
+                <!-- Buttons injected here -->
+            </div>
         </div>
     </div>
 
@@ -2296,3 +2296,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
