@@ -1419,7 +1419,11 @@ function setupScrollReveal() {
                 entry.target.classList.add('active');
                 entry.target.classList.remove('reveal-init');
             }
-            // REMOVED THE PROBLEMATIC ELSE IF BLOCK
+            // RESTORED: Keep re-animation on scroll up
+            else if (document.body.classList.contains('animations-ready')) {
+                entry.target.classList.remove('active');
+                entry.target.classList.add('reveal-init');
+            }
         });
     }, {
         root: null,
@@ -1810,6 +1814,7 @@ function setupBackToTopButton() {
     });
 }
 
+// --- LIVE NOTIFICATION BANNER SYSTEM (60-second interval) ---
 function setupNotificationSystem() {
     const banner = document.getElementById('liveNotificationBanner');
     const messageEl = document.getElementById('notificationMessage');
@@ -1851,10 +1856,12 @@ function setupNotificationSystem() {
             if (shouldShow) showBanner(data.message, data.type);
             else hideBanner();
         } catch (error) {
+            // Hide banner if fetch fails (no backend)
             hideBanner();
         }
     }
 
+    // Initial fetch and 60-second interval
     fetchNotification();
     setInterval(fetchNotification, 60000);
 }
@@ -2119,7 +2126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHamburgerMenu();
     setupBackToTopButton();
     setupQrCodeModal();
-    setupNotificationSystem();
+    setupNotificationSystem(); // This activates the notification banner
     setupScrollSpy();
     setupTvRemoteLogic();
 
@@ -2142,4 +2149,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
