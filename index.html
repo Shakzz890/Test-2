@@ -1955,6 +1955,191 @@ function findNextFocus(direction) {
     }
 
     const currentRect = focusedElement.getBoundingClientRect();
+    let bestCandidate = null;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < focusables.length; i++) {
+        if (i === currentIndex) continue;
+
+        const candidate = focusables[i];
+        const candidateRect = candidate.getBoundingClientRect();
+
+        let isValidDirection = false;
+        let distance = 0;
+
+        switch (direction) {
+            case 'up':
+                isValidDirection = candidateRect.bottom <= currentRect.top;
+                distance = currentRect.top - candidateRect.bottom;
+                break;
+            case 'down':
+                isValidDirection = candidateRect.top >= currentRect.bottom;
+                distance = candidateRect.top - currentRect.bottom;
+                break;
+            case 'left':
+                isValidDirection = candidateRect.right <= currentRect.left;
+                distance = currentRect.left - candidateRect.right;
+                break;
+            case 'right':
+                isValidDirection = candidateRect.left >= currentRect.right;
+                distance = candidateRect.left - currentRect.right;
+                break;
+        }
+
+        if (isValidDirection) {
+            let misalignment = 0;
+            if (direction === 'up' || direction === 'down') {
+                 misalignment = Math.abs((currentRect.left + currentRect.right) / 2 - (candidateRect.left + candidateRect.right) / 2);
+            } else {
+                 misalignment = Math.abs((currentRect.top + currentRect.bottom) / 2 - (candidateRect.top + candidateRect.bottom) / 2);
+            }
+            
+            const weightedDistance = distance * 0.7 + misalignment * 0.3;
+
+            if (weightedDistance < minDistance) {
+                minDistance = weightedDistance;
+                bestCandidate = candidate;
+            }
+        }
+    }
+
+    if (!bestCandidate) {
+        if (direction === 'down' || direction === 'right') {
+            nextIndex = (currentIndex + 1) % focusables.length;
+        } else if (direction === 'up' || direction === 'left') {
+            nextIndex = (currentIndex - 1 + focusables.length) % focusables.length;
+        }
+        return focusables[nextIndex];
+    }
+    
+    return bestCandidate;
+}
+
+function setupTvRemoteLogic() {
+    const isMobileView = window.matchMedia("(max-width: 992px)").matches;
+    
+    window.addEventListener('keydown', (e) => {
+        const activeModal = document.querySelector('.modal-overlay.active');
+        
+        if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'Back' || e.key === 'Exit') {
+            e.preventDefault();
+            
+            const qrModal = document.getElementById('qrModal');
+            if (qrModal && qrModal.classList.contains('active')) {
+                document.getElementById('closeQrModalBtn').click();
+                return;
+            }
+            
+            const catModal = document.getElementById('categoryModal');
+            if (catModal && catModal.classList.contains('active')) {
+                document.getElementById('closeCategoryModal').click();
+                return;
+            }
+            
+            const mobileMenu = document.getElementById('navPages');
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                document.getElementById('hamburger').click();
+                return;
+            }
+            
+            const welcomeModal = document.getElementById('welcomeModal');
+             if (welcomeModal && welcomeModal.classList.contains('active')) {
+                document.getElementById('closeModalBtn').click();
+                return;
+            }
+            
+            if (window.scrollY > 0) {
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                 return;
+            }
+        }
+
+        let direction = null;
+        switch (e.key) {
+            case 'ArrowUp':
+            case 'Up':
+                direction = 'up';
+                break;
+            case 'ArrowDown':
+            case 'Down':
+                direction = 'down';
+                break;
+            case 'ArrowLeft':
+            case 'Left':
+                direction = 'left';
+                break;
+            case 'ArrowRight':
+            case 'Right':
+                direction = 'right';
+                break;
+            case 'Enter':
+            case 'Select':
+                if (focusedElement) {
+                    if (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    focusedElement.click();
+                    e.preventDefault();
+                } else {
+                    if (!isMobileView) {
+                        setTvFocus(document.getElementById('search') || document.querySelector('.channel-button'));
+                    }
+                }
+                return;
+        }
+
+        if (direction) {
+            e.preventDefault();
+            const nextElement = findNextFocus(direction);
+            
+            if (nextElement) {
+                setTvFocus(nextElement);
+                nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    });
+    
+    window.addEventListener('load', () => {
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            setTvFocus(searchInput);
+        } else {
+            const firstLink = document.querySelector('.nav-pages a');
+            if(firstLink) setTvFocus(firstLink);
+        }
+    });
+}
+
+// --- 9. MAIN INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    setupScrollReveal();
+    setupSearch();
+    setupCategoryTabs();
+    setupWelcomeModal();
+    setupHamburgerMenu();
+    setupBackToTopButton();
+    setupQrCodeModal();
+    setupNotificationSystem();
+    setupScrollSpy();
+    setupTvRemoteLogic();
+
+    const clearFavBtn = document.getElementById("clearFavoritesBtn");
+    if (clearFavBtn) {
+        clearFavBtn.addEventListener('click', clearAllFavorites);
+    }
+
+    if (typeof channels !== 'undefined') {
+        sortedChannels = Object.entries(channels).sort((a, b) => a[1].name.localeCompare(b[1].name));
+        loadFavoritesFromStorage();
+        renderChannelButtons();
+        resetChannelListScroll();
+        if (channels[currentChannelKey]) loadChannel(currentChannelKey);
+    }
+
+    updateViewerCount();
+    setInterval(updateViewerCount, 5000);
+});
 </script>
 </body>
 </html>
+
