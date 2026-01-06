@@ -1,4 +1,4 @@
-const channels = {
+export const channels = {
 GMA: { 
 	name: "GMA 7",
     type: "hls",
@@ -1199,7 +1199,7 @@ celmoviepinoy: {
 // ANIME SERIES DATA
 // ==========================================
 
-const animeData = {
+export const animeData = {
     "One Punch Man": [
         { 
             name: "Episode 1", 
