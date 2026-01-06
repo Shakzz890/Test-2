@@ -1,9 +1,8 @@
-// src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
 import { useTMDB } from '../hooks/useTMDB';
 import { useLoader } from '../components/CutieLoader';
-import MediaGrid from '../components/MediaGrid'; // Reuse from previous
-import HeroSlider from '../components/HeroSlider'; // Reuse from previous
+import MediaGrid from '../components/MediaGrid';
+import HeroSlider from '../components/HeroSlider';
 
 const Home = () => {
     const { fetchHomeFeeds } = useTMDB();
@@ -28,15 +27,17 @@ const Home = () => {
     }, [fetchHomeFeeds]);
 
     return (
-        <div className="bg-background min-h-screen pb-20">
+        <div className="bg-[#0f0f0f] min-h-screen pb-20">
+            {/* Hero Slider */}
             {feeds.trending.length > 0 && <HeroSlider items={feeds.trending.slice(0, 5)} />}
             
-            <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-20 space-y-12">
-                <MediaGrid title="Upcoming Movies" items={feeds.upcoming} />
-                <MediaGrid title="Latest TV Shows" items={feeds.latestTv} />
-                <MediaGrid title="Trending K-Drama" items={feeds.kdrama} />
-                <MediaGrid title="Trending C-Drama" items={feeds.cdrama} />
-                <MediaGrid title="Popular Anime" items={feeds.anime} />
+            {/* Content Grids with Horizontal Scrolling */}
+            <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-20 space-y-4">
+                <MediaGrid title="Upcoming Movies" items={feeds.upcoming} isHorizontal={true} />
+                <MediaGrid title="Latest TV Shows" items={feeds.latestTv} isHorizontal={true} />
+                <MediaGrid title="Trending K-Drama" items={feeds.kdrama} isHorizontal={true} />
+                <MediaGrid title="Trending C-Drama" items={feeds.cdrama} isHorizontal={true} />
+                <MediaGrid title="Popular Anime" items={feeds.anime} isHorizontal={true} />
             </div>
         </div>
     );
