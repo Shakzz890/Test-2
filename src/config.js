@@ -1,12 +1,9 @@
-// src/config.js
-
 export const TMDB_API_KEY = '4eea503176528574efd91847b7a302cc'; 
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-export const IMG_BASE_URL = 'https://image.tmdb.org/t/p/original';
-export const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w300';
-export const PLACEHOLDER_IMG = '/logo.png';
+export const IMG_URL = 'https://image.tmdb.org/t/p/original';
+export const POSTER_URL = 'https://image.tmdb.org/t/p/w300';
+export const PLACEHOLDER_IMG = '/logo.png'; // Make sure you have a logo.png in public folder
 
-// Specific sandbox policies from your script
 export const PROVIDER_SANDBOX_POLICY = {
     'vidsrc.to': "allow-scripts allow-same-origin allow-presentation allow-forms allow-pointer-lock",
     'vidsrc.me': "allow-scripts allow-same-origin allow-presentation allow-forms",
@@ -21,10 +18,11 @@ export const PROVIDER_SANDBOX_POLICY = {
 };
 
 export const SERVERS = [
-    { name: "VidSrc.to", domain: 'vidsrc.to', getUrl: (type, id, s, e) => `https://vidsrc.to/embed/${type}/${id}${type==='tv'?`/${s}/${e}`:''}` },
-    { name: "VidSrc.me", domain: 'vidsrc.me', getUrl: (type, id, s, e) => type==='tv' ? `https://vidsrc.me/embed/tv?tmdb=${id}&season=${s}&episode=${e}` : `https://vidsrc.me/embed/movie?tmdb=${id}` },
-    { name: "VidLink", domain: 'vidlink.pro', getUrl: (type, id, s, e) => type==='tv' ? `https://vidlink.pro/tv/${id}/${s}/${e}` : `https://vidlink.pro/movie/${id}` },
-    { name: "SuperEmbed", domain: 'superembed.stream', getUrl: (type, id, s, e) => type==='tv' ? `https://superembed.stream/tv/${id}/${s}/${e}` : `https://superembed.stream/movie/${id}` },
-    { name: "2Embed", domain: '2embed.cc', getUrl: (type, id) => `https://www.2embed.cc/embed/${id}` },
-    { name: "VidSrc.cc", domain: 'vidsrc.cc', getUrl: (type, id, s, e) => type==='tv' ? `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}` : `https://vidsrc.cc/v2/embed/movie/${id}` },
+    { name: "Server 1 (VidSrc)", value: "vidsrc.to" },
+    { name: "Server 2 (VidSrc.me)", value: "vidsrc.me" },
+    { name: "Server 3 (VidLink)", value: "vidlink.pro" },
+    { name: "Server 4 (SuperEmbed)", value: "superembed.stream" },
+    { name: "Server 5 (2Embed)", value: "2embed.cc" },
+    { name: "Server 6 (VidSrc.cc)", value: "vidsrc.cc" },
+    { name: "Server 7 (VidSrc.xyz)", value: "vidsrc.xyz" },
 ];
