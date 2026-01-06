@@ -1,9 +1,7 @@
 // src/pages/LiveTV.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { PLACEHOLDER_IMG } from '../config';
-
-// Mock Channel Data (Replace this with your actual 'channels' object import)
-import { channels } from '../data/channels'; 
+import { channels, animeData } from '../data/channels';
 
 const TABS = ["all", "favorites", "news", "entertainment", "movies", "sports", "documentary", "cartoons & animations", "anime tagalog dubbed"];
 
