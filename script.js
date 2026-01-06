@@ -511,25 +511,27 @@ async function showDetailView(item) {
     currentItem = item;
     detailMode = "info";
 
-    // 1. Show the view
     const view = document.getElementById('detail-view');
     view.style.display = 'flex';
 
-    // 2. Populate basic info
+    // Populate Info
     document.getElementById('detail-title').innerText = item.title || item.name;
     document.getElementById('detail-overview').innerText = item.overview || "No overview available.";
     document.getElementById('detail-date').innerText = (item.first_air_date || item.release_date || "2025").substring(0, 4);
 
-    // 3. Handle Poster
     document.getElementById('detail-poster-img').src = item.backdrop_path 
         ? `${IMG_URL}${item.backdrop_path}` 
         : `${POSTER_URL}${item.poster_path}`;
 
-    // 4. Reset Player
-    document.getElementById('detail-video').src = '';
+    // --- KEY FIX HERE ---
+    // Ensure the Video is HIDDEN and the Poster Section is SHOWN
+    const videoFrame = document.getElementById('detail-video');
+    if(videoFrame) {
+        videoFrame.src = ''; // Stop previous video
+        videoFrame.style.display = 'none'; // Hide the player layer
+    }
     document.getElementById('detail-poster-section').style.display = 'block';
-
-    // --- CORRECTION STARTS HERE (Removed the premature closing brace) ---
+    // --------------------
 
     const favBtn = document.querySelector('.action-item');
     if (favBtn) favBtn.classList.remove('active');
@@ -542,7 +544,6 @@ async function showDetailView(item) {
 
     if (isTv) {
         try {
-            // Fetch extra TV details (seasons)
             const res = await fetch(`${BASE_URL}/tv/${item.id}?api_key=${API_KEY}`);
             currentDetails = await res.json();
             if (filters) filters.style.display = 'flex';
@@ -551,15 +552,13 @@ async function showDetailView(item) {
             console.error(e);
         }
     } else {
-        // It's a Movie
         if (filters) filters.style.display = 'none';
         renderMovieEpisode();
     }
-
-    // Initialize player source (defaulting to S1 E1 or Movie)
+    
+    // Pre-load the link but keep player hidden until user clicks "Watch"
     changeDetailServer(1, 1);
-} 
-// --- CORRECTION ENDS HERE (Function closes correctly now) ---
+}
 
 
 function closeDetailView() {
@@ -994,10 +993,80 @@ function setupTvRemoteLogic() {
         }
     });
 }
+function setupTvRemoteNavigation() {
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        const active = document.activeElement;
+
+        if (!active || !active.classList.contains('focusable-element')) return;
+
+        let next;
+
+        if (key === 'ArrowRight') {
+            next = active.nextElementSibling;
+        }
+        if (key === 'ArrowLeft') {
+            next = active.previousElementSibling;
+        }
+        if (key === 'ArrowDown') {
+            next = findVertical(active, 'down');
+        }
+        if (key === 'ArrowUp') {
+            next = findVertical(active, 'up');
+        }
+
+        if (next && next.classList.contains('focusable-element')) {
+            e.preventDefault();
+            next.focus();
+        }
+
+        if (key === 'Enter') {
+            e.preventDefault();
+            active.click();
+        }
+
+        if (key === 'Backspace' || key === 'Escape') {
+            e.preventDefault();
+            handleTvBack();
+        }
+    });
+}
+function findVertical(current, direction) {
+    const rect = current.getBoundingClientRect();
+    const elements = [...document.querySelectorAll('.focusable-element')];
+
+    let best = null;
+    let bestDist = Infinity;
+
+    elements.forEach(el => {
+        if (el === current) return;
+        const r = el.getBoundingClientRect();
+
+        const verticalValid =
+            direction === 'down'
+                ? r.top >= rect.bottom
+                : r.bottom <= rect.top;
+
+        if (!verticalValid) return;
+
+        const dx = Math.abs(r.left - rect.left);
+        const dy = Math.abs(r.top - rect.top);
+        const dist = dx + dy;
+
+        if (dist < bestDist) {
+            bestDist = dist;
+            best = el;
+        }
+    });
+
+    return best;
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     CutieLoader.show();
-    
+    setupTvRemoteNavigation();
+
     setupCategoryTabs();
     setupTvRemoteLogic();
     checkLoginState(); 
@@ -1040,10 +1109,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2500); 
 });
 window.startPlayback = function () {
+    if (!currentItem) {
+        console.error("No item selected to play.");
+        return;
+    }
+
     detailMode = "player";
 
-    document.getElementById('detail-poster-section').style.display = 'none';
+    // 1. Hide the Info/Poster Section
+    const posterSection = document.getElementById('detail-poster-section');
+    if (posterSection) posterSection.style.display = 'none';
 
+    // 2. SHOW the Video Player (Crucial Fix)
+    const videoFrame = document.getElementById('detail-video');
+    if (videoFrame) {
+        videoFrame.style.display = 'block';
+        videoFrame.style.zIndex = '100'; // Ensure it is on top
+    }
+
+    // 3. Determine type and load server
     const isTv =
         currentItem.media_type === 'tv' ||
         currentItem.first_air_date ||
@@ -1051,9 +1135,10 @@ window.startPlayback = function () {
 
     currentItem.media_type = isTv ? 'tv' : 'movie';
 
+    // Load the correct video
     if (isTv) {
-        changeDetailServer(1, 1);
+        changeDetailServer(currentSeason || 1, currentEpisode || 1);
     } else {
-        changeDetailServer();
+        changeDetailServer(1, 1);
     }
 };
