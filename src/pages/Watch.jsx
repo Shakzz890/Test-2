@@ -1,10 +1,9 @@
-// src/pages/Watch.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { SERVERS, PROVIDER_SANDBOX_POLICY } from '../config';
 import { useTMDB } from '../hooks/useTMDB';
-import Dropdown from '../components/Dropdown'; // Re-using from previous
-import { ArrowLeft } from 'lucide-react';
+import Dropdown from '../components/Dropdown';
+import { ArrowLeft, MonitorPlay } from 'lucide-react';
 
 const Watch = () => {
     const [params] = useSearchParams();
@@ -14,48 +13,52 @@ const Watch = () => {
     const type = params.get('type');
     const id = params.get('id');
     
-    // State
-    const [currentServer, setCurrentServer] = useState(0);
+    const [currentServer, setCurrentServer] = useState(() => Number(localStorage.getItem('currentServer')) || 0);
     const [season, setSeason] = useState(1);
     const [episode, setEpisode] = useState(1);
     const [episodesList, setEpisodesList] = useState([]);
-    const [tvData, setTvData] = useState(null);
-    const [sandboxEnabled, setSandboxEnabled] = useState(() => localStorage.getItem("sandboxEnabled") !== "false");
+    const [mediaData, setMediaData] = useState(null);
+    const [sandboxEnabled, setSandboxEnabled] = useState(() => {
+        const saved = localStorage.getItem("sandboxEnabled");
+        return saved !== null ? JSON.parse(saved) : true;
+    });
 
     const iframeRef = useRef(null);
 
-    // Initial Load & TV Data
+    // Persist Settings
     useEffect(() => {
-        if(type === 'tv') {
-            // Fetch TV details to get season count (simplified for brevity)
-            fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=4eea503176528574efd91847b7a302cc`)
-                .then(r => r.json())
-                .then(data => {
-                    setTvData(data);
-                    // Load saved progress
-                    const saved = JSON.parse(localStorage.getItem(`watch_${id}`));
-                    if(saved) {
-                        setSeason(saved.season);
-                        setEpisode(saved.episode);
-                    }
-                });
-        }
+        localStorage.setItem('currentServer', currentServer);
+        localStorage.setItem('sandboxEnabled', JSON.stringify(sandboxEnabled));
+    }, [currentServer, sandboxEnabled]);
+
+    // Fetch Initial Data
+    useEffect(() => {
+        fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=4eea503176528574efd91847b7a302cc`)
+            .then(r => r.json())
+            .then(data => {
+                setMediaData(data);
+                // Load Watch Progress
+                const savedProgress = JSON.parse(localStorage.getItem(`watch_${id}`));
+                if (savedProgress) {
+                    setSeason(savedProgress.season);
+                    setEpisode(savedProgress.episode);
+                }
+            });
     }, [type, id]);
 
-    // Fetch Episodes when season changes
+    // Fetch Episodes for TV
     useEffect(() => {
         if(type === 'tv') {
             fetchSeason(id, season).then(setEpisodesList);
         }
-    }, [type, id, season, fetchSeason]);
+    }, [type, id, season]);
 
     // Save Progress
     useEffect(() => {
         localStorage.setItem(`watch_${id}`, JSON.stringify({ season, episode }));
-        localStorage.setItem(`watched_${id}_${season}_${episode}`, "true");
     }, [id, season, episode]);
 
-    // Handle Sandbox Logic
+    // Apply Sandbox Policy
     useEffect(() => {
         const serverDomain = SERVERS[currentServer].domain;
         const policy = PROVIDER_SANDBOX_POLICY[serverDomain];
@@ -67,83 +70,78 @@ const Watch = () => {
                 iframeRef.current.removeAttribute("sandbox");
             }
         }
-    }, [currentServer, sandboxEnabled]);
+    }, [currentServer, sandboxEnabled, iframeRef.current]);
 
     const src = SERVERS[currentServer].getUrl(type, id, season, episode);
 
     return (
-        <div className="h-screen bg-black flex flex-col">
-            {/* Header Controls */}
-            <div className="flex items-center justify-between p-4 bg-neutral-900 text-white z-10">
-                <button onClick={() => navigate(-1)} className="flex items-center gap-2 hover:text-red-500">
-                    <ArrowLeft size={20} /> Back
-                </button>
-                <div className="flex gap-4">
-                    <Dropdown 
-                        value={currentServer}
-                        options={SERVERS.map((s, i) => ({ value: i, label: s.name }))}
-                        onChange={setCurrentServer}
-                    />
-                    <label className="flex items-center gap-2 cursor-pointer text-sm">
-                        <input 
-                            type="checkbox" 
-                            checked={sandboxEnabled} 
-                            onChange={(e) => {
-                                setSandboxEnabled(e.target.checked);
-                                localStorage.setItem("sandboxEnabled", e.target.checked);
-                            }} 
+        <div className="h-screen bg-black flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-[#111] border-b border-white/5 z-20 shrink-0">
+                <div className="flex items-center gap-4">
+                    <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                        <ArrowLeft className="text-white" />
+                    </button>
+                    <div>
+                        <h1 className="text-white font-bold text-lg md:text-xl truncate max-w-[200px] md:max-w-md">
+                            {mediaData?.title || mediaData?.name || "Loading..."}
+                        </h1>
+                        {type === 'tv' && <p className="text-neutral-400 text-xs">S{season} : E{episode}</p>}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <div className="hidden md:block w-48">
+                        <Dropdown 
+                            value={currentServer}
+                            options={SERVERS.map((s, i) => ({ value: i, label: s.name }))}
+                            onChange={setCurrentServer}
                         />
-                        Sandbox Mode
-                    </label>
+                    </div>
+                    <button 
+                        onClick={() => setSandboxEnabled(!sandboxEnabled)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${sandboxEnabled ? 'bg-red-600 border-red-600 text-white' : 'bg-transparent border-neutral-600 text-neutral-400'}`}
+                        title="Toggle Ad-Block / Sandbox"
+                    >
+                        {sandboxEnabled ? 'Sandbox ON' : 'Sandbox OFF'}
+                    </button>
                 </div>
             </div>
 
-            {/* Player Container */}
-            <div className="flex-1 relative bg-black">
+            {/* Video Player */}
+            <div className="flex-1 relative bg-black w-full h-full">
                 <iframe
                     ref={iframeRef}
-                    key={`${currentServer}-${season}-${episode}-${sandboxEnabled}`} // Force re-render on change
+                    key={`${currentServer}-${season}-${episode}-${sandboxEnabled}`}
                     src={src}
-                    className="w-full h-full border-0"
+                    className="absolute inset-0 w-full h-full border-0"
                     allowFullScreen
-                    title="Shakzz Player"
+                    allow="encrypted-media; fullscreen; picture-in-picture"
                 />
             </div>
 
-            {/* TV Controls Footer */}
-            {type === 'tv' && tvData && (
-                <div className="p-4 bg-neutral-900 flex gap-4 overflow-x-auto">
-                    <select 
-                        value={season} 
-                        onChange={(e) => setSeason(Number(e.target.value))}
-                        className="bg-neutral-800 text-white p-2 rounded"
-                    >
-                        {tvData.seasons?.map(s => (
-                            <option key={s.id} value={s.season_number}>
-                                {s.name} ({s.episode_count} eps)
-                            </option>
-                        ))}
-                    </select>
-                    
-                    <select 
-                        value={episode}
-                        onChange={(e) => setEpisode(Number(e.target.value))}
-                        className="bg-neutral-800 text-white p-2 rounded"
-                    >
-                        {episodesList.map(e => (
-                            <option key={e.id} value={e.episode_number}>
-                                Episode {e.episode_number}: {e.name}
-                            </option>
-                        ))}
-                    </select>
-                    
-                    <button 
-                        className="bg-neutral-700 px-4 py-2 rounded text-white"
-                        onClick={() => setEpisode(prev => prev + 1)}
-                        disabled={episode >= episodesList.length}
-                    >
-                        Next Episode
-                    </button>
+            {/* TV Episode Selector (Bottom) */}
+            {type === 'tv' && episodesList.length > 0 && (
+                <div className="h-24 bg-[#111] border-t border-white/5 p-4 overflow-x-auto flex gap-3 shrink-0 items-center">
+                    {episodesList.map((ep) => {
+                        const isWatched = localStorage.getItem(`watched_${id}_${season}_${ep.episode_number}`);
+                        const isActive = ep.episode_number === episode;
+                        
+                        return (
+                            <button
+                                key={ep.id}
+                                onClick={() => setEpisode(ep.episode_number)}
+                                className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all relative ${
+                                    isActive 
+                                    ? 'bg-[#e50914] text-white' 
+                                    : 'bg-[#222] text-neutral-300 hover:bg-[#333]'
+                                }`}
+                            >
+                                <span className="block">EP {ep.episode_number}</span>
+                                {isWatched && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-green-500 rounded-full"></span>}
+                            </button>
+                        )
+                    })}
                 </div>
             )}
         </div>
