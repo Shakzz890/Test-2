@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import SearchResults from './SearchResults';
 
 const Navbar = ({ onSearch, searchResults, isSearching }) => {
   const [scrolled, setScrolled] = useState(false);
   const [query, setQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [watchlistCount, setWatchlistCount] = useState(0);
+  const searchRef = useRef(null);
   const navigate = useNavigate();
 
-  // Watchlist count listener
+  // Handle Scroll Effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 0);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle Watchlist Count
   useEffect(() => {
     const updateCount = () => {
       const list = JSON.parse(localStorage.getItem("watchlist")) || [];
@@ -20,11 +30,15 @@ const Navbar = ({ onSearch, searchResults, isSearching }) => {
     return () => window.removeEventListener("watchlist-update", updateCount);
   }, []);
 
-  // Scroll listener
+  // Click Outside to Close Search
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 0);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSearch = (e) => {
@@ -40,56 +54,89 @@ const Navbar = ({ onSearch, searchResults, isSearching }) => {
     setShowSearch(false);
   };
 
-  const navClass = ({ isActive }) => `
-    relative px-4 py-3 text-base rounded-lg transition-all duration-300
-    ${isActive ? "text-white font-semibold bg-red-600/10" : "text-white/60 hover:text-white"}
-  `;
+  const navLinkClass = ({ isActive }) => 
+    `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+      isActive 
+      ? "bg-white/10 text-white font-bold" 
+      : "text-neutral-400 hover:text-white"
+    }`;
 
   return (
-    <nav className={`fixed top-0 w-full z-[1000] px-4 py-4 transition-all ${scrolled ? "bg-black/90" : ""}`}>
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        
-        {/* LOGO SECTION - CHANGED BACK TO TEXT */}
-        <NavLink to="/" className="no-underline">
-          <div className="logo-text">
-            SHAKZZ<span style={{ color: '#e50914' }}>TV</span>
-          </div>
-        </NavLink>
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex gap-4">
-          <NavLink to="/" end className={navClass}>Home</NavLink>
-          <NavLink to="/tv-shows" className={navClass}>TV Shows</NavLink>
-          <NavLink to="/movies" className={navClass}>Movies</NavLink>
-          <NavLink to="/watchlist" className={navClass}>
-            Watchlist
-            {watchlistCount > 0 && (
-              <span className="ml-2 bg-red-700 text-white text-sm rounded-full px-1.5">{watchlistCount}</span>
-            )}
+    <>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 md:px-8 py-4 ${scrolled ? "bg-[#0f0f0f]/95 backdrop-blur-md shadow-md" : "bg-transparent"}`}>
+        <div className="max-w-7xl mx-auto flex justify-between items-center h-10">
+          
+          {/* LOGO */}
+          <NavLink to="/" className="flex items-center gap-2 group">
+             <div className="text-2xl font-black tracking-tighter text-white group-hover:scale-105 transition-transform">
+               SHAKZZ<span className="text-[#e50914]">TV</span>
+             </div>
           </NavLink>
-        </div>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex relative w-[300px]">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={query}
-            onChange={handleSearch}
-            onFocus={() => setShowSearch(true)}
-            onBlur={() => setTimeout(() => setShowSearch(false), 200)}
-            className="w-full rounded-full bg-white/10 border border-white/30 px-4 py-2.5 outline-none focus:border-red-700 text-white"
-          />
-          {showSearch && query && (
-            <SearchResults 
-              results={searchResults} 
-              loading={isSearching} 
-              onSelect={handleSelect} 
-            />
-          )}
+          {/* DESKTOP MENU */}
+          <div className="hidden md:flex items-center gap-2 bg-[#1a1a1a] p-1 rounded-full border border-white/10">
+            <NavLink to="/" className={navLinkClass}>Home</NavLink>
+            <NavLink to="/movies" className={navLinkClass}>Movies</NavLink>
+            <NavLink to="/tv-shows" className={navLinkClass}>TV Shows</NavLink>
+            <NavLink to="/watchlist" className={navLinkClass}>
+              Watchlist
+              {watchlistCount > 0 && (
+                <span className="ml-2 bg-[#e50914] text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                  {watchlistCount}
+                </span>
+              )}
+            </NavLink>
+          </div>
+
+          {/* SEARCH & MOBILE TOGGLE */}
+          <div className="flex items-center gap-4">
+            <div className="relative hidden md:block" ref={searchRef}>
+              <div className={`flex items-center bg-[#1a1a1a] border border-white/10 rounded-full px-4 py-1.5 transition-all ${showSearch ? 'w-64 border-[#e50914]' : 'w-40 hover:border-white/30'}`}>
+                <Search size={16} className="text-neutral-400 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={query}
+                  onChange={handleSearch}
+                  onFocus={() => setShowSearch(true)}
+                  className="bg-transparent border-none outline-none text-white text-sm w-full placeholder:text-neutral-500"
+                />
+              </div>
+              {showSearch && query && (
+                <SearchResults results={searchResults} onSelect={handleSelect} />
+              )}
+            </div>
+
+            <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* MOBILE MENU OVERLAY */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-40 bg-[#0f0f0f] pt-20 px-6 animate-slideDown">
+          <div className="flex flex-col gap-4 text-center">
+             <input
+                type="text"
+                placeholder="Search..."
+                value={query}
+                onChange={handleSearch}
+                className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg p-3 text-white mb-4 outline-none focus:border-[#e50914]"
+              />
+              {query && <div className="max-h-60 overflow-y-auto mb-4"><SearchResults results={searchResults} onSelect={handleSelect} /></div>}
+              
+              <NavLink to="/" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-white py-2 border-b border-white/5">Home</NavLink>
+              <NavLink to="/movies" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-white py-2 border-b border-white/5">Movies</NavLink>
+              <NavLink to="/tv-shows" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-white py-2 border-b border-white/5">TV Shows</NavLink>
+              <NavLink to="/watchlist" onClick={() => setMobileMenuOpen(false)} className="text-xl font-medium text-white py-2">
+                Watchlist ({watchlistCount})
+              </NavLink>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
