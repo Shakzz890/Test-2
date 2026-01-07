@@ -47,17 +47,23 @@ const Watch = () => {
     // Construct URL
     const activeServer = SERVERS[currentServer];
     let src = '';
+    // Note: This logic mirrors your original script exactly
     if(activeServer.value === 'vidsrc.to') src = `https://vidsrc.to/embed/${type}/${id}${type==='tv'?`/${season}/${episode}`:''}`;
     else if(activeServer.value === 'vidsrc.me') src = type==='tv' ? `https://vidsrc.me/embed/tv?tmdb=${id}&season=${season}&episode=${episode}` : `https://vidsrc.me/embed/movie?tmdb=${id}`;
-    // ... add logic for other servers based on your script
+    // ... add logic for other servers based on your script.js if needed ...
+    else src = activeServer.getUrl ? activeServer.getUrl(type, id, season, episode) : `https://vidsrc.to/embed/${type}/${id}`;
 
     return (
         <div id="detail-view" style={{display:'flex', flexDirection:'column', height:'100vh', background:'#000'}}>
              <div className="player-container" style={{display:'block', flex:1}}>
                 <div className="server-select-container">
+                    <button onClick={() => navigate(-1)} style={{color:'white', background:'none', border:'none', fontSize:'20px'}}>
+                        <i className="fa-solid fa-arrow-left"></i>
+                    </button>
+                    
                     <select 
                         onChange={(e) => setCurrentServer(Number(e.target.value))}
-                        style={{background:'#111', color:'#fff', padding:'5px'}}
+                        style={{background:'#111', color:'#fff', padding:'5px', border:'1px solid #333'}}
                     >
                         {SERVERS.map((s, i) => <option key={i} value={i}>{s.name}</option>)}
                     </select>
@@ -88,7 +94,7 @@ const Watch = () => {
                 </div>
 
                 {type === 'tv' && (
-                    <div className="episode-grid">
+                    <div className="episode-grid" style={{padding:'10px', height:'100px', overflowY:'auto'}}>
                         {episodesList.map(ep => (
                             <button 
                                 key={ep.id} 
