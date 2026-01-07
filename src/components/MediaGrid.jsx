@@ -21,7 +21,10 @@ const MediaGrid = ({ title, items, isHorizontal = false }) => {
         </h2>
       )}
       
-      {/* Logic: If Horizontal, use .list, else use .grid-list from CSS */}
+      {/* KEY FIX: 
+         If isHorizontal is true, we use "list" (Flexbox + Scroll).
+         If false, we use "grid-list" (CSS Grid).
+      */}
       <div className={isHorizontal ? "list" : "grid-list"}>
         {items.map((item) => (
           <div key={item.id} className="movie-card" onClick={() => handleClick(item)} tabIndex="0">

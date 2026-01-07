@@ -13,7 +13,7 @@ const Sidebar = ({ isOpen, toggle }) => {
               <NavLink to="/" onClick={toggle}><i className="fa-solid fa-house"></i> Home</NavLink>
               <NavLink to="/movies" onClick={toggle}><i className="fa-regular fa-compass"></i> Movies</NavLink>
               <NavLink to="/tv-shows" onClick={toggle}><i className="fa-solid fa-tv"></i> TV Shows</NavLink>
-              <NavLink to="/live" onClick={toggle}><i className="fa-solid fa-broadcast-tower"></i> Live TV</NavLink>
+              <NavLink to="/live" onClick={toggle}><i className="fa-solid fa-tv"></i> Live TV</NavLink>
               <NavLink to="/watchlist" onClick={toggle}><i className="fa-solid fa-bookmark"></i> Watchlist</NavLink>
           </div>
           <div className="sidebar-footer">

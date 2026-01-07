@@ -8,7 +8,7 @@ const Navbar = ({ toggleSidebar }) => {
           <div className="hamburger" onClick={toggleSidebar}>
             <i className="fa-solid fa-bars"></i>
           </div>
-          <Link to="/" className="logo-text">
+          <Link to="/" className="logo-text" style={{textDecoration:'none'}}>
             SHAKZZ<span style={{color:'#e50914'}}>TV</span>
           </Link>
       </div>
